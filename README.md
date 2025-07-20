@@ -105,11 +105,11 @@ Our mission is to make data "smart"—self-governing, purpose-bound, and auditab
 |----------------------|----------------------------------------|
 | **Frontend Decryption**  | AES-256 + JWT                          |
 | **AI Engine**            | Scikit-learn / TensorFlow.js (local)   |
-| **Blockchain Logging**   | Hyperledger / Solidity-based chain     |
-| **Backend Services**     | Node.js + Express                      |
+| **Blockchain Logging**   | HardHat / Solidity-based chain         |
+| **Backend Services**     | Spring MVC & Spring Boot               |
 | **Infrastructure**       | Docker, Cron Jobs, AWS (scalable)      |
 | **Compliance Engine**    | Custom APIs for consent & data deletion|
-| **Database**             | Firebase / MongoDB (flexible)          |
+| **Database**             | Firebase / PostgreSQL (flexible)          |
 
 ---
 
@@ -141,9 +141,9 @@ Built with passion by **Team Codeblooded**:
 
 ### Prerequisites
 
-- Node.js (>= 14.0.0)
-- npm or yarn
-- Docker (optional, for containerized deployment)
+- Java 17 (or Higher)
+- Maven 3.6+ (or Gradle 7+)
+- Git
 
 ### Steps
 
@@ -157,24 +157,23 @@ Built with passion by **Team Codeblooded**:
    cd SurakshaVault
    ```
 
-3. **Install dependencies:**
+3. **Configure the project**
    ```bash
-   npm install
+   cp src/main/resources/application.properties.example src/main/resources/application.properties
    ```
 
-4. **Set up environment variables:**
+4. **Build The Project**
    ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
+   mvn clean install
    ```
 
-5. **Start the development server:**
+5. **Run The Application:**
    ```bash
-   npm start
+   mvn spring-boot:run
    ```
 
 6. **Access the application:**
-   - Open your browser and navigate to `http://localhost:3000`
+   - Open your browser and navigate to `http://localhost:8080`
 
 ---
 
@@ -182,7 +181,7 @@ Built with passion by **Team Codeblooded**:
 
 ### Getting Started
 
-1. **Access the application** at `http://localhost:3000`
+1. **Access the application** at `http://localhost:8080`
 
 2. **Use mock credentials** for different user roles:
    - **Admin**: Full system access and partner verification
