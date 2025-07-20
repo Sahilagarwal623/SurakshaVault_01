@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Partner & Admin Portal</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    .section { border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem; }
+    input[type="text"], input[type="password"], input[type="number"] {
+      width: 100%; padding: 0.5rem; margin-top: 0.3rem;
+    }
+    button { padding: 0.5rem 1rem; margin-top: 0.7rem; }
+    #message { margin-top: 1rem; color: #006600; }
+  </style>
+</head>
+<body>
+
+  <h1>Partner & Admin Portal</h1>
+
+  <!-- Partner Registration -->
+  <div class="section" id="partner-register">
+    <h2>Partner Registration</h2>
+    <label>Username:<br/><input type="text" id="pr-username" /></label>
+    <label>Email:<br/><input type="text" id="pr-email" /></label>
+    <label>Company Age:<br/><input type="number" id="pr-age" min="0" /></label>
+    <label>Password:<br/><input type="password" id="pr-pass" /></label>
+    <button onclick="partnerRegister()">Register Partner</button>
+  </div>
+
+  <!-- Partner Verification/Login -->
+  <div class="section" id="partner-login" style="display:none;">
+    <h2>Partner Check & Login</h2>
+    <label>Username:<br/><input type="text" id="pv-username" /></label><br/>
+    <button onclick="checkPartner()">Check Verification Status</button><br/>
+    <div id="partner-actions" style="display:none; margin-top: 0.8rem;">
+      <label>Password:<br/><input type="password" id="pv-password" /></label><br/>
+      <button onclick="partnerLogin()">Login</button>
+    </div>
+  </div>
+
+  <!-- Admin Login -->
+  <div class="section" id="admin-login">
+    <h2>Admin Login</h2>
+    <label>Username (email):<br/><input type="text" id="ad-user" /></label>
+    <label>Password:<br/><input type="password" id="ad-pass" /></label>
+    <button onclick="adminLogin()">Login as Admin</button>
+  </div>
+
+  <!-- Admin Panel -->
+  <div class="section" id="admin-panel" style="display:none;">
+    <h2>Admin – Verify Partners</h2>
+    <ul id="company-list"></ul>
+  </div>
+
+  <div id="message"></div>
+
+  <script>
+    const API = 'http://192.168.230.123:8080/auth';
+
+    function showMessage(msg) {
+      document.getElementById('message').innerText = msg;
+    }
+
+    async function partnerRegister() {
+      const data = {
+        username: document.getElementById('pr-username').value,
+        email: document.getElementById('pr-email').value,
+        companyAge: parseInt(document.getElementById('pr-age').value) || 0,
+        password: document.getElementById('pr-pass').value
+      };
+      try {
+        const res = await fetch(`${API}/PartnerRegistration`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Failed to register');
+        showMessage('Registration submitted!');
+        document.getElementById('partner-register').style.display = 'none';
+        document.getElementById('partner-login').style.display = 'block';
+      } catch (err) {
+        showMessage(err.message);
+      }
+    }
+
+    async function checkPartner() {
+      const username = document.getElementById('pv-username').value;
+      try {
+        const res = await fetch(`${API}/partnerRegistration/${encodeURIComponent(username)}`);
+        if (!res.ok) throw new Error('Partner not found.');
+        const partner = await res.json();
+        if (partner.isRegistration) {
+          showMessage('Verified! Please enter your password to log in.');
+          document.getElementById('partner-actions').style.display = 'block';
+        } else {
+          showMessage('Not verified by admin yet.');
+        }
+      } catch (err) {
+        showMessage(err.message);
+      }
+    }
+
+    async function partnerLogin() {
+      const data = {
+        username: document.getElementById('pv-username').value,
+        password: document.getElementById('pv-password').value
+      };
+      try {
+        const res = await fetch(`${API}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Login failed.');
+        showMessage('Partner logged in successfully!');
+      } catch (err) {
+        showMessage(err.message);
+      }
+    }
+
+    let adminToken = '';
+
+    async function adminLogin() {
+      const data = {
+        username: document.getElementById('ad-user').value,
+        password: document.getElementById('ad-pass').value
+      };
+      try {
+        const res = await fetch(`${API}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Admin login failed.');
+        adminToken = await res.text();
+        showMessage('Admin logged in successfully!');
+        document.getElementById('admin-login').style.display = 'none';
+        document.getElementById('admin-panel').style.display = 'block';
+        loadCompanies();
+      } catch (err) {
+        showMessage(err.message);
+      }
+    }
+
+    async function loadCompanies() {
+      try {
+        const res = await fetch(`${API}/CompanyUsernames`, {
+          headers: { Authorization: `Bearer ${adminToken}` }
+        });
+        if (!res.ok) throw new Error('Failed to load companies');
+        const companies = await res.json();
+        const ul = document.getElementById('company-list');
+        ul.innerHTML = '';
+        companies.forEach(username => {
+          const li = document.createElement('li');
+          li.textContent = username + ' ';
+          const btn = document.createElement('button');
+          btn.textContent = 'Verify';
+          btn.onclick = () => verifyPartner(username);
+          li.appendChild(btn);
+          ul.appendChild(li);
+        });
+      } catch (err) {
+        showMessage(err.message);
+      }
+    }
+
+    async function verifyPartner(username) {
+      try {
+        const res = await fetch(`${API}/PartnerRegistration/${encodeURIComponent(username)}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${adminToken}`
+          }
+        });
+        if (!res.ok) throw new Error('Verification failed');
+        showMessage(`${username} has been verified!`);
+        loadCompanies();
+      } catch (err) {
+        showMessage(err.message);
+      }
+    }
+  </script>
+
+</body>
+</html>

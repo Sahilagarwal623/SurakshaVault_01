@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Portal | SurakshaVault</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light Mode Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+            
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-inverse: #ffffff;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-overlay: rgba(0, 0, 0, 0.5);
+            
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --border-focus: #6366f1;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            
+            --navbar-height: 4rem;
+        }
+
+        /* Dark Mode Colors */
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --primary-light: #c7d2fe;
+            --secondary: #34d399;
+            --accent: #fbbf24;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --success: #34d399;
+            --info: #60a5fa;
+            
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --text-inverse: #111827;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            --bg-overlay: rgba(0, 0, 0, 0.8);
+            
+            --border: #334155;
+            --border-light: #475569;
+            --border-focus: #818cf8;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Enhanced Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--navbar-height);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .brand-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .company-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--accent), #d97706);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .company-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: var(--navbar-height);
+            padding: 2rem;
+            min-height: calc(100vh - var(--navbar-height));
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2rem;
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .content-card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .content-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content-card-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .content-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: var(--bg-card);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--primary);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* User List */
+        .user-list {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-item:hover {
+            background: var(--bg-card);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--secondary), #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .user-status {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .user-arrow {
+            color: var(--text-muted);
+            font-size: 1.25rem;
+        }
+
+        /* Messages and Notices */
+        .message-container {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid var(--primary-light);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-icon {
+            color: var(--primary);
+            font-size: 1.125rem;
+        }
+
+        .message-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .message-content {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .notice-container {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .notice-title {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notice-content {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Alert Messages */
+        .alert {
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            margin: 1rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--warning);
+        }
+
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: var(--info);
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+            margin-top: 0.125rem;
+        }
+
+        /* Data Display */
+        .data-display {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .data-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .data-item:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .data-icon {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .data-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 120px;
+        }
+
+        .data-value {
+            color: var(--text-secondary);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            flex: 1;
+        }
+
+        /* Calendar Styling */
+        .calendar-container {
+            position: relative;
+        }
+
+        .calendar-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-right: 2.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: var(--bg-card);
+        }
+
+        .calendar-icon {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Fade-in Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(1rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-container {
+                padding: 0 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-container {
+                padding: 0 0.75rem;
+            }
+            
+            .main-content {
+                padding: 0.75rem;
+            }
+        }
+
+        /* Hidden elements */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-description {
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <!-- Enhanced Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="#" class="brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div>
+                        <span class="brand-text">SurakshaVault</span>
+                        <div class="brand-subtitle">Company Portal</div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="navbar-right">
+                <button class="navbar-btn" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                
+                <div class="company-avatar" id="companyAvatar" title="Company Account">C</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- LOGIN FORM -->
+        <div class="content-card fade-in" id="loginForm">
+            <div class="content-card-header">
+                <h2 class="content-card-title">
+                    <div class="content-card-icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    Company Authentication
+                </h2>
+            </div>
+            <div class="content-card-body">
+                <div class="message-container">
+                    <div class="message-header">
+                        <i class="fas fa-shield-alt message-icon"></i>
+                        <span class="message-title">Secure Company Access</span>
+                    </div>
+                    <div class="message-content">
+                        Welcome to the SurakshaVault Company Portal. Please authenticate with your company credentials to access user consent data securely.
+                    </div>
+                </div>
+
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label class="form-label" for="loginUsername">
+                            <i class="fas fa-building"></i> Company Username
+                        </label>
+                        <input type="text" id="loginUsername" class="form-input" placeholder="Enter your company username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" required>
+                    </div>
+
+                    <div class="notice-container">
+                        <div class="notice-title">
+                            <i class="fas fa-info-circle"></i>
+                            Security Notice
+                        </div>
+                        <div class="notice-content">
+                            All data access is logged and monitored. Ensure you comply with data protection regulations and user consent terms.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Authenticate
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- CONSENT REQUESTS LIST -->
+        <div class="content-card fade-in hidden" id="consentListSection">
+            <div class="content-card-header">
+                <h2 class="content-card-title">
+                    <div class="content-card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    Active Consent Requests
+                </h2>
+            </div>
+            <div class="content-card-body">
+                <div class="message-container">
+                    <div class="message-header">
+                        <i class="fas fa-handshake message-icon"></i>
+                        <span class="message-title">User Consent Management</span>
+                    </div>
+                    <div class="message-content">
+                        Below are users who have granted your company access to their data. Click on any user to fetch their information according to the consent terms.
+                    </div>
+                </div>
+
+                <div id="consentList" class="user-list"></div>
+
+                <div id="emptyState" class="empty-state hidden">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <div class="empty-state-title">No Consent Requests</div>
+                    <div class="empty-state-description">
+                        There are currently no active consent requests for your company.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- USER DATA FORM -->
+        <div class="content-card fade-in hidden" id="userDataForm">
+            <div class="content-card-header">
+                <h2 class="content-card-title">
+                    <div class="content-card-icon">
+                        <i class="fas fa-download"></i>
+                    </div>
+                    Fetch User Data
+                </h2>
+            </div>
+            <div class="content-card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle alert-icon"></i>
+                    <div>
+                        <strong>Selected User:</strong> <span id="selectedUser"></span><br>
+                        Please specify the access location and time to retrieve the user's data according to their consent terms.
+                    </div>
+                </div>
+
+                <form id="userDataFormElement">
+                    <div class="form-group">
+                        <label class="form-label" for="locationSelect">
+                            <i class="fas fa-globe"></i> Access Location
+                        </label>
+                        <select id="locationSelect" class="form-select" required>
+                            <option value="">-- Select country --</option>
+                            <option value="India">🇮🇳 India</option>
+                            <option value="United States">🇺🇸 United States</option>
+                            <option value="United Kingdom">🇬🇧 United Kingdom</option>
+                            <option value="Canada">🇨🇦 Canada</option>
+                            <option value="Australia">🇦🇺 Australia</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="accessDateTime">
+                            <i class="fas fa-calendar-alt"></i> Access Date & Time
+                        </label>
+                        <div class="calendar-container">
+                            <input type="datetime-local" id="accessDateTime" class="calendar-input" required>
+                            <i class="fas fa-calendar-alt calendar-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="notice-container">
+                        <div class="notice-title">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Compliance Reminder
+                        </div>
+                        <div class="notice-content">
+                            Ensure that your data access request complies with the user's consent terms, including geographical restrictions and time limitations.
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success btn-full">
+                        <i class="fas fa-download"></i>
+                        Fetch User Data
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- USER DATA DISPLAY -->
+        <div class="content-card fade-in hidden" id="userDataSection">
+            <div class="content-card-header">
+                <h2 class="content-card-title">
+                    <div class="content-card-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    User Data Results
+                </h2>
+            </div>
+            <div class="content-card-body">
+                <div id="messageBox"></div>
+                <div id="userDataDisplay"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const companyAvatar = document.getElementById('companyAvatar');
+        let currentTheme = localStorage.getItem('sv_theme') || 'light';
+
+        function initTheme() {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateThemeIcon();
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('sv_theme', currentTheme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = themeToggle.querySelector('i');
+            icon.className = currentTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            themeToggle.title = currentTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+        }
+
+        // Set company avatar
+        function setCompanyAvatar(companyName) {
+            if (companyName) {
+                companyAvatar.textContent = companyName.charAt(0).toUpperCase();
+            }
+        }
+
+        // Original functionality
+        const apiBase = 'http://192.168.230.123:8080';
+        let companyName = '';
+        let selectedUsername = '';
+
+        function setCurrentDateTime() {
+            const dtInput = document.getElementById('accessDateTime');
+            if (dtInput) {
+                const now = new Date();
+                const tzOffset = now.getTimezoneOffset() * 60000;
+                const localISO = new Date(now - tzOffset).toISOString().slice(0,16);
+                dtInput.value = localISO;
+            }
+        }
+
+        // Auto-login if sv_token and sv_username present
+        window.onload = () => {
+            initTheme();
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            const storedUser = localStorage.getItem('sv_username');
+            const storedToken = localStorage.getItem('sv_token');
+            setCurrentDateTime();
+            
+            if (storedUser && storedToken) {
+                companyName = storedUser;
+                setCompanyAvatar(companyName);
+                document.getElementById('loginForm').classList.add('hidden');
+                loadConsentRequests();
+            }
+        };
+
+        // LOGIN
+        document.getElementById('loginFormElement').addEventListener('submit', async e => {
+            e.preventDefault();
+            companyName = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const resp = await fetch(`${apiBase}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: companyName, password })
+                });
+
+                if (!resp.ok) {
+                    throw new Error('Login failed');
+                }
+
+                const jwtToken = await resp.text();
+                localStorage.setItem('sv_username', companyName);
+                localStorage.setItem('sv_token', jwtToken);
+
+                setCompanyAvatar(companyName);
+                document.getElementById('loginForm').classList.add('hidden');
+                loadConsentRequests();
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
+
+        // LOAD CONSENT REQUESTS
+        async function loadConsentRequests() {
+            try {
+                const token = localStorage.getItem('sv_token');
+                const resp = await fetch(`${apiBase}/user-consent/company/${encodeURIComponent(companyName)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!resp.ok) {
+                    throw new Error(`Error ${resp.status} fetching consents`);
+                }
+
+                const list = await resp.json();
+                const container = document.getElementById('consentList');
+                const emptyState = document.getElementById('emptyState');
+                
+                container.innerHTML = '';
+
+                if (list.length === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                    
+                    list.forEach(c => {
+                        const userItem = document.createElement('div');
+                        userItem.className = 'user-item';
+                        userItem.onclick = () => showUserDataForm(c.id.username);
+                        
+                        userItem.innerHTML = `
+                            <div class="user-avatar">${c.id.username.charAt(0).toUpperCase()}</div>
+                            <div class="user-info">
+                                <div class="user-name">${c.id.username}</div>
+                                <div class="user-status">Active consent • Click to access data</div>
+                            </div>
+                            <div class="user-arrow">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        `;
+                        
+                        container.appendChild(userItem);
+                    });
+                }
+
+                document.getElementById('consentListSection').classList.remove('hidden');
+            } catch (err) {
+                console.error('Network error:', err);
+                alert('Cannot fetch consent requests: ' + err.message);
+            }
+        }
+
+        // SHOW LOCATION AND TIME SELECTOR
+        function showUserDataForm(username) {
+            selectedUsername = username;
+            document.getElementById('selectedUser').textContent = username;
+            document.getElementById('userDataForm').classList.remove('hidden');
+            document.getElementById('userDataSection').classList.add('hidden');
+            setCurrentDateTime();
+        }
+
+        // FETCH USER DATA
+        document.getElementById('userDataFormElement').addEventListener('submit', async e => {
+            e.preventDefault();
+            const token = localStorage.getItem('sv_token');
+            const location = document.getElementById('locationSelect').value;
+            const dtValue = document.getElementById('accessDateTime').value;
+
+            const payload = {
+                username: selectedUsername,
+                companyName,
+                location,
+                localDateTime: new Date(dtValue).toISOString()
+            };
+
+            try {
+                const resp = await fetch(`${apiBase}/getData`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const msgBox = document.getElementById('messageBox');
+                const display = document.getElementById('userDataDisplay');
+                msgBox.innerHTML = '';
+                display.innerHTML = '';
+                document.getElementById('userDataSection').classList.remove('hidden');
+
+                if (!resp.ok) {
+                    msgBox.innerHTML = `
+                        <div class="alert alert-error">
+                            <i class="fas fa-exclamation-triangle alert-icon"></i>
+                            <div>
+                                <strong>Access Denied</strong><br>
+                                Error ${resp.status}: Unable to fetch user data. Please check your permissions and try again.
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const data = await resp.json();
+                const nonNullEntries = Object.entries(data).filter(([_, value]) => value !== null);
+
+                if (nonNullEntries.length === 0) {
+                    msgBox.innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="fas fa-shield-alt alert-icon"></i>
+                            <div>
+                                <strong>Policy Violation Detected</strong><br>
+                                Access denied due to consent expiration, revocation, or unauthorized geographical access. Please verify the consent terms and your access location.
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    msgBox.innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle alert-icon"></i>
+                            <div>
+                                <strong>Data Retrieved Successfully</strong><br>
+                                User data has been fetched according to the active consent terms. ${nonNullEntries.length} field(s) available.
+                            </div>
+                        </div>
+                    `;
+
+                    const dataContainer = document.createElement('div');
+                    nonNullEntries.forEach(([key, value]) => {
+                        let label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                        let icon = 'fas fa-info-circle';
+                        
+                        switch (key) {
+                            case 'username': 
+                                label = 'Username'; 
+                                icon = 'fas fa-user';
+                                break;
+                            case 'adhaarNumber': 
+                                label = 'Aadhaar Number'; 
+                                icon = 'fas fa-id-card';
+                                break;
+                            case 'panNumber': 
+                                label = 'PAN Number'; 
+                                icon = 'fas fa-credit-card';
+                                break;
+                            case 'annualIncome': 
+                                label = 'Annual Income'; 
+                                icon = 'fas fa-money-bill-wave';
+                                break;
+                            case 'accountNumber': 
+                                label = 'Account Number'; 
+                                icon = 'fas fa-university';
+                                break;
+                            case 'cardNumber': 
+                                label = 'Card Number'; 
+                                icon = 'fas fa-credit-card';
+                                break;
+                            case 'cibilScore': 
+                                label = 'CIBIL Score'; 
+                                icon = 'fas fa-chart-line';
+                                break;
+                            case 'transactions': 
+                                label = 'Transactions'; 
+                                icon = 'fas fa-exchange-alt';
+                                break;
+                        }
+                        
+                        const dataItem = document.createElement('div');
+                        dataItem.className = 'data-item';
+                        dataItem.innerHTML = `
+                            <i class="${icon} data-icon"></i>
+                            <div class="data-label">${label}</div>
+                            <div class="data-value">${value}</div>
+                        `;
+                        dataContainer.appendChild(dataItem);
+                    });
+                    
+                    display.appendChild(dataContainer);
+                }
+            } catch (error) {
+                const msgBox = document.getElementById('messageBox');
+                msgBox.innerHTML = `
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-triangle alert-icon"></i>
+                        <div>
+                            <strong>Network Error</strong><br>
+                            Unable to connect to the server. Please check your connection and try again.
+                        </div>
+                    </div>
+                `;
+                document.getElementById('userDataSection').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consent Dashboard | SurakshaVault</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="ai-commands.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light Mode Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+            
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-inverse: #ffffff;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-overlay: rgba(0, 0, 0, 0.5);
+            
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --border-focus: #6366f1;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            
+            --navbar-height: 4rem;
+            --sidebar-width: 16rem;
+        }
+
+        /* Dark Mode Colors */
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --primary-light: #c7d2fe;
+            --secondary: #34d399;
+            --accent: #fbbf24;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --success: #34d399;
+            --info: #60a5fa;
+            
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --text-inverse: #111827;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            --bg-overlay: rgba(0, 0, 0, 0.8);
+            
+            --border: #334155;
+            --border-light: #475569;
+            --border-focus: #818cf8;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Enhanced Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--navbar-height);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sidebar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .brand-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-center {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 20rem;
+            height: 2.5rem;
+            padding: 0 1rem 0 2.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            width: 1rem;
+            height: 1rem;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.625rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .user-menu {
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Enhanced Sidebar */
+        .sidebar {
+            position: fixed;
+            top: var(--navbar-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--navbar-height));
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-content {
+            padding: 1.5rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            padding: 0 0.75rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .sidebar-nav-link:hover,
+        .sidebar-nav-link.active {
+            background: var(--bg-tertiary);
+            color: var(--primary);
+        }
+
+        .sidebar-nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 1.5rem;
+            background: var(--primary);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        .sidebar-nav-icon {
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 0;
+            margin-top: var(--navbar-height);
+            padding: 2rem;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        .main-content.sidebar-open {
+            margin-left: var(--sidebar-width);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-focus);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .stat-card-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .stat-card-icon.success { background: linear-gradient(135deg, var(--success), #059669); }
+        .stat-card-icon.danger { background: linear-gradient(135deg, var(--danger), #dc2626); }
+        .stat-card-icon.info { background: linear-gradient(135deg, var(--info), #2563eb); }
+        .stat-card-icon.warning { background: linear-gradient(135deg, var(--warning), #d97706); }
+
+        .stat-card-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .stat-card-change.positive { color: var(--success); }
+        .stat-card-change.negative { color: var(--danger); }
+
+        /* Content Cards */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .content-card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .content-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content-card-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .content-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Enhanced Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .table th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        /* Chart Containers */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-overlay);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .navbar-center {
+                display: none;
+            }
+            
+            .main-content.sidebar-open {
+                margin-left: 0;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-width: var(--sidebar-width);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-container {
+                padding: 0 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-input {
+                width: 15rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-container {
+                padding: 0 0.75rem;
+            }
+            
+            .main-content {
+                padding: 0.75rem;
+            }
+            
+            .search-input {
+                width: 12rem;
+            }
+            
+            .stat-card-value {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Smooth Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(1rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Custom Scrollbar for Sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--radius-sm);
+        }
+</style>
+    <style>
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            top: 2.5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            min-width: 260px;
+            max-width: 400px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 1.1rem 1.7rem;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast .toast-icon {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+        .toast .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .toast .toast-close:hover {
+            color: var(--danger);
+        }
+    </style>
+    <style>
+        /* AI Agent Floating Button & Chat */
+        .ai-agent-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 2100;
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            border: none;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+        .ai-agent-btn:hover {
+            box-shadow: 0 8px 24px rgba(99,102,241,0.2);
+            transform: scale(1.08);
+        }
+        .ai-agent-chat {
+            position: fixed;
+            bottom: 2.5rem;
+            right: 2.5rem;
+            width: 420px;
+            max-width: 98vw;
+            max-height: 650px;
+            min-height: 400px;
+            background: var(--bg-card);
+            border: 1.5px solid var(--primary);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            z-index: 2101;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .ai-agent-chat.open {
+            display: flex;
+        }
+        .ai-agent-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ai-agent-header .ai-title {
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .ai-agent-header .ai-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .ai-agent-messages {
+            flex: 1;
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-secondary);
+            overflow-y: auto;
+            font-size: 1.05rem;
+            max-height: 420px;
+            min-height: 180px;
+            word-break: break-word;
+        }
+        .ai-agent-input {
+            display: flex;
+            border-top: 1px solid var(--border);
+            background: var(--bg-card);
+            padding: 0.75rem 1.25rem;
+        }
+        .ai-agent-input input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 0.75rem 1rem;
+            font-size: 1.08rem;
+            color: var(--text-primary);
+            outline: none;
+        }
+        .ai-agent-input button {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 0.75rem 1.25rem;
+            margin-left: 0.75rem;
+            font-size: 1.08rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .ai-agent-input button:hover {
+            background: var(--primary-dark);
+        }
+        .ai-msg {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .ai-msg.user {
+            justify-content: flex-end;
+        }
+        .ai-msg .ai-bubble {
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-xl);
+            background: var(--primary-light);
+            color: var(--text-primary);
+            max-width: 90%;
+            word-break: break-word;
+            white-space: pre-line;
+            font-size: 1.05rem;
+        }
+        .ai-msg.user .ai-bubble {
+            background: var(--secondary);
+            color: #fff;
+        }
+        .ai-msg.ai .ai-bubble {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--primary-light);
+        }
+        /* AI Agent Control Buttons - Like Back to Dashboard */
+        .ai-control-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            background: var(--primary);
+            color: #fff;
+            box-shadow: none;
+            outline: none;
+        }
+        .ai-control-btn:hover, .ai-control-btn:focus {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        /* Responsive AI Chatbot */
+        @media (max-width: 600px) {
+            .ai-agent-chat {
+                right: 0.5rem;
+                left: 0.5rem;
+                width: auto;
+                min-width: 0;
+                max-width: 98vw;
+                border-radius: 1rem;
+                padding: 0;
+            }
+            .ai-agent-btn {
+                right: 1rem;
+                bottom: 1rem;
+                width: 3rem;
+                height: 3rem;
+                font-size: 1.3rem;
+            }
+            .ai-agent-header, .ai-agent-input {
+                padding-left: 0.7rem;
+                padding-right: 0.7rem;
+            }
+            .ai-agent-messages {
+                padding-left: 0.7rem;
+                padding-right: 0.7rem;
+            }
+        }
+    </style>
+    <!-- AI Agent Floating Button and Chat -->
+    <button class="ai-agent-btn" id="aiAgentBtn" title="Ask AI Agent">
+        <i class="fas fa-robot"></i>
+    </button>
+    <div class="ai-agent-chat" id="aiAgentChat">
+        <div class="ai-agent-header">
+            <span class="ai-title"><i class="fas fa-robot"></i> Suraksha Bot</span>
+            <button class="ai-close" id="aiAgentClose" title="Close">&times;</button>
+        </div>
+        <div class="ai-agent-messages" id="aiAgentMessages">
+            <div class="ai-msg ai">
+                <div class="ai-bubble">
+                    Hi! I'm your SurakshaVault AI assistant. Here are some quick actions you can take:
+                    <div class="ai-controls" style="margin-top:0.75rem; display:flex; flex-wrap:wrap; gap:0.5rem;">
+                        <button class="ai-control-btn" data-action="show-consents">Show Active Consents</button>
+                        <button class="ai-control-btn" data-action="go-profile">Go to Profile</button>
+                        <button class="ai-control-btn" data-action="change-theme">Change Theme</button>
+                        <button class="ai-control-btn" data-action="refresh-profile">Refresh Profile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form class="ai-agent-input" id="aiAgentForm" autocomplete="off">
+            <input type="text" id="aiAgentInput" placeholder="Type your question..." required />
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+        </form>
+    </div>
+    <script>
+        const aiBtn = document.getElementById('aiAgentBtn');
+        const aiChat = document.getElementById('aiAgentChat');
+        const aiClose = document.getElementById('aiAgentClose');
+        const aiForm = document.getElementById('aiAgentForm');
+        const aiInput = document.getElementById('aiAgentInput');
+        const aiMessages = document.getElementById('aiAgentMessages');
+
+
+// --- AI Chat History Logic ---
+const AI_CHAT_HISTORY_KEY = 'sv_ai_chat_history';
+const AI_CHAT_HISTORY_TIME_KEY = 'sv_ai_chat_history_time';
+const AI_CHAT_HISTORY_MAX_AGE = 20 * 60 * 1000; // 20 minutes in ms
+
+function saveAiChatHistory() {
+    const history = Array.from(aiMessages.children).map(div => ({
+        who: div.classList.contains('user') ? 'user' : 'ai',
+        html: div.querySelector('.ai-bubble').innerHTML
+    }));
+    localStorage.setItem(AI_CHAT_HISTORY_KEY, JSON.stringify(history));
+    localStorage.setItem(AI_CHAT_HISTORY_TIME_KEY, Date.now().toString());
+}
+
+function loadAiChatHistory() {
+    const time = parseInt(localStorage.getItem(AI_CHAT_HISTORY_TIME_KEY), 10);
+    if (!time || (Date.now() - time) > AI_CHAT_HISTORY_MAX_AGE) {
+        localStorage.removeItem(AI_CHAT_HISTORY_KEY);
+        localStorage.removeItem(AI_CHAT_HISTORY_TIME_KEY);
+        return false;
+    }
+    const history = JSON.parse(localStorage.getItem(AI_CHAT_HISTORY_KEY) || '[]');
+    aiMessages.innerHTML = '';
+    for (const msg of history) {
+        const div = document.createElement('div');
+        div.className = 'ai-msg ' + msg.who;
+        div.innerHTML = `<div class="ai-bubble">${msg.html}</div>`;
+        aiMessages.appendChild(div);
+    }
+    aiMessages.scrollTop = aiMessages.scrollHeight;
+    return true;
+}
+
+function clearAiChatHistory() {
+    localStorage.removeItem(AI_CHAT_HISTORY_KEY);
+    localStorage.removeItem(AI_CHAT_HISTORY_TIME_KEY);
+}
+
+aiBtn.addEventListener('click', () => {
+    aiChat.classList.add('open');
+    // Restore chat history if within 20 minutes, else show default
+    if (!loadAiChatHistory()) {
+        aiMessages.innerHTML = `<div class="ai-msg ai">
+            <div class="ai-bubble">
+                Hi! I'm your SurakshaVault AI assistant. Here are some quick actions you can take:
+                <div class="ai-controls" style="margin-top:0.75rem; display:flex; flex-wrap:wrap; gap:0.5rem;">
+                    <button class="ai-control-btn" data-action="show-consents">Show Active Consents</button>
+                    <button class="ai-control-btn" data-action="go-profile">Go to Profile</button>
+                    <button class="ai-control-btn" data-action="change-theme">Change Theme</button>
+                    <button class="ai-control-btn" data-action="refresh-profile">Refresh Profile</button>
+                </div>
+            </div>
+        </div>`;
+    }
+    setTimeout(() => aiInput.focus(), 200);
+});
+aiClose.addEventListener('click', () => {
+    aiChat.classList.remove('open');
+    saveAiChatHistory();
+});
+
+// Remove chat history if browser/tab is closed (not just reload)
+window.addEventListener('unload', function(e) {
+    clearAiChatHistory();
+});
+
+// Delegate control button actions
+aiMessages.addEventListener('click', function(e) {
+    if (e.target.classList.contains('ai-control-btn')) {
+        const action = e.target.getAttribute('data-action');
+        handleAiControl(action);
+        saveAiChatHistory();
+    }
+});
+
+// ...existing code...
+
+
+// Gemini API Integration (using gemini-2.0-flash, API key in header)
+const GEMINI_API_KEY = 'AIzaSyCUnzkbxC32qmZsvN-2YKORfPNiEA10W_k'; // <-- Replace with your Gemini API key
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+
+aiForm.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const msg = aiInput.value.trim();
+    if (!msg) return;
+    appendAiMessage(msg, 'user');
+    aiInput.value = '';
+    saveAiChatHistory();
+
+    // Use AI_COMMANDS for operation triggers
+    if (typeof matchAiCommand === 'function') {
+        const cmd = matchAiCommand(msg);
+        if (cmd) {
+            if (cmd.response) {
+                appendAiMessage(cmd.response, 'ai');
+                saveAiChatHistory();
+            }
+            setTimeout(() => { if (typeof cmd.action === 'function') cmd.action(); }, 500);
+            return;
+        }
+    }
+    await getAiResponse(msg);
+});
+
+function appendAiMessage(text, who) {
+    const div = document.createElement('div');
+    div.className = 'ai-msg ' + who;
+    div.innerHTML = `<div class="ai-bubble">${text}</div>`;
+    aiMessages.appendChild(div);
+    aiMessages.scrollTop = aiMessages.scrollHeight;
+}
+
+async function getAiResponse(msg) {
+    // Show loading indicator
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'ai-msg ai';
+    loadingDiv.innerHTML = `<div class="ai-bubble" style="display:flex;align-items:center;gap:0.7em;min-height:2.2em;">
+      <span class="loading"></span>
+      <span class="typing-animation-ui">
+        <span class="dot dot1"></span>
+        <span class="dot dot2"></span>
+        <span class="dot dot3"></span>
+      </span>
+    </div>`;
+    aiMessages.appendChild(loadingDiv);
+    aiMessages.scrollTop = aiMessages.scrollHeight;
+
+    // Typing animation logic
+    // No JS animation needed, CSS handles bounce
+    const dots = loadingDiv.querySelectorAll('.dot');
+    let typingInterval = null; // For compatibility with clearInterval
+
+    try {
+        const res = await fetch(GEMINI_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-goog-api-key': GEMINI_API_KEY
+            },
+            body: JSON.stringify({
+                contents: [
+                    {
+                        parts: [
+                            { text: msg }
+                        ]
+                    }
+                ]
+            })
+        });
+        if (!res.ok) throw new Error('API error');
+        const data = await res.json();
+        let aiText =
+            data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0].text
+                ? data.candidates[0].content.parts[0].text.trim()
+                : 'Sorry, I could not understand that.';
+
+        // Markdown-like post-processing: * to bullet, ** to bold
+        aiText = aiText
+            .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>') // **bold**
+            .replace(/^\s*\*\s+/gm, '• '); // * bullet
+
+        // Remove loading and stop typing animation
+        if (typingInterval) clearInterval(typingInterval);
+        aiMessages.removeChild(loadingDiv);
+        appendAiMessage(aiText, 'ai');
+        saveAiChatHistory();
+
+        // Custom triggers for theme/profile
+        const lowerMsg = msg.toLowerCase();
+        if (lowerMsg.includes('change theme')) {
+            setTimeout(() => { toggleTheme(); }, 600);
+        } else if (lowerMsg.includes('show me profile') || lowerMsg.includes('go to profile')) {
+            setTimeout(() => { window.location.href = 'profile.html'; }, 900);
+        }
+    } catch (err) {
+        if (typingInterval) clearInterval(typingInterval);
+        aiMessages.removeChild(loadingDiv);
+        appendAiMessage('Sorry, there was a problem connecting to the AI service.', 'ai');
+        saveAiChatHistory();
+    }
+}
+
+function handleAiControl(action) {
+    if (action === 'show-consents') {
+        let list = app.data.consentHistory.map(c => `• <b>${c.partner}</b>: ${c.action} (${c.status})`).join('<br>');
+        appendAiMessage('Your active consents:<br>' + list, 'ai');
+    } else if (action === 'go-profile') {
+        appendAiMessage('Redirecting to your profile...', 'ai');
+        setTimeout(() => { window.location.href = 'profile.html'; }, 900);
+    } else if (action === 'change-theme') {
+        appendAiMessage('Toggling theme...', 'ai');
+        setTimeout(() => { toggleTheme(); }, 500);
+    } else if (action === 'refresh-profile') {
+        appendAiMessage('Refreshing profile...', 'ai');
+        setTimeout(() => { window.location.href = 'profile.html'; }, 900);
+    }
+}
+    </script>
+<style>
+/* Improved Typing animation for AI chat */
+.typing-animation-ui {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 0.25em;
+  height: 1.5em;
+  margin-left: 0.5em;
+}
+.typing-animation-ui .dot {
+  width: 0.5em;
+  height: 0.5em;
+  border-radius: 50%;
+  display: inline-block;
+  background: var(--primary);
+  margin: 0 0.1em;
+  animation: bounce 1.2s infinite;
+  opacity: 0.85;
+}
+.typing-animation-ui .dot1 {
+  animation-delay: 0s;
+  background: var(--primary);
+}
+.typing-animation-ui .dot2 {
+  animation-delay: 0.2s;
+  background: var(--secondary);
+}
+.typing-animation-ui .dot3 {
+  animation-delay: 0.4s;
+  background: var(--accent);
+}
+@keyframes bounce {
+  0%, 80%, 100% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  40% {
+    transform: translateY(-0.5em);
+    opacity: 1;
+  }
+}
+</style>
+</head>
+<body>
+    <!-- Enhanced Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="#" class="brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <span class="brand-text">SurakshaVault</span>
+                </a>
+            </div>
+            
+            <div class="navbar-center">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Search consents, partners, or actions...">
+                </div>
+            </div>
+            
+            <div class="navbar-right">
+                <button class="navbar-btn" id="notificationBtn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" id="notificationCount">3</span>
+                </button>
+                
+                <button class="navbar-btn" id="settingsBtn" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                
+                <button class="navbar-btn" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                
+                <div class="user-menu" style="position:relative;">
+                    <div class="user-avatar" id="dashboard-avatar" title="User Menu"></div>
+                    <div id="userDropdown" class="user-dropdown" style="display:none; position:absolute; top:110%; right:0; min-width:160px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); box-shadow:var(--shadow-lg); z-index:1200;">
+                        <button class="user-dropdown-item" id="showProfileBtn" style="width:100%; padding:0.75rem 1.25rem; background:none; border:none; color:var(--text-primary); text-align:left; font-size:1rem; cursor:pointer; border-radius:var(--radius-md); transition:background 0.2s;">Show Profile</button>
+                        <button class="user-dropdown-item" id="logoutBtn" style="width:100%; padding:0.75rem 1.25rem; background:none; border:none; color:var(--danger); text-align:left; font-size:1rem; cursor:pointer; border-radius:var(--radius-md); transition:background 0.2s;">Logout</button>
+                    </div>
+                </div>
+    <style>
+        .user-dropdown {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            min-width: 160px;
+            padding: 0.25rem 0;
+        }
+        .user-dropdown-item {
+            width: 100%;
+            padding: 0.75rem 1.25rem;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            text-align: left;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: var(--radius-md);
+            transition: background 0.2s, color 0.2s;
+        }
+        .user-dropdown-item:hover {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+        }
+        .user-dropdown-item#logoutBtn {
+            color: var(--danger);
+        }
+        .user-dropdown-item#logoutBtn:hover {
+            background: rgba(239,68,68,0.08);
+            color: var(--danger);
+        }
+    </style>
+    <script>
+    // User avatar dropdown logic
+    const dashboardAvatar = document.getElementById('dashboard-avatar');
+    const userDropdown = document.getElementById('userDropdown');
+    const showProfileBtn = document.getElementById('showProfileBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (dashboardAvatar && userDropdown) {
+        dashboardAvatar.addEventListener('click', function(e) {
+            e.stopPropagation();
+            userDropdown.style.display = userDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        document.addEventListener('click', function(e) {
+            if (!userDropdown.contains(e.target) && e.target !== dashboardAvatar) {
+                userDropdown.style.display = 'none';
+            }
+        });
+    }
+    if (showProfileBtn) {
+        showProfileBtn.addEventListener('click', function() {
+            window.location.href = 'profile.html';
+        });
+    }
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            showLogoutConfirmationToast();
+        });
+    }
+
+    // Toast confirmation for logout
+    function showLogoutConfirmationToast() {
+        const toast = document.getElementById('toast');
+        const toastMsg = document.getElementById('toast-message');
+        if (!toast || !toastMsg) return;
+        toastMsg.innerHTML = `Are you sure you want to logout?
+            <div style="margin-top:0.8em; display:flex; gap:0.7em;">
+                <button id="confirmLogoutBtn" style="background:var(--danger); color:#fff; border:none; border-radius:6px; padding:0.4em 1.3em; cursor:pointer; font-size:1em; font-weight:600;">Confirm Logout</button>
+                <button id="skipLogoutBtn" style="background:var(--primary-light); color:var(--primary-dark); border:none; border-radius:6px; padding:0.4em 1.3em; cursor:pointer; font-size:1em; font-weight:500;">Skip</button>
+            </div>`;
+        toast.classList.add('show');
+        setTimeout(() => {
+            const confirmBtn = document.getElementById('confirmLogoutBtn');
+            const skipBtn = document.getElementById('skipLogoutBtn');
+            if (confirmBtn) {
+                confirmBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    toast.classList.remove('show');
+                    localStorage.clear();
+                    window.location.href = 'auth.html';
+                };
+            }
+            if (skipBtn) {
+                skipBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    toast.classList.remove('show');
+                };
+            }
+        }, 100);
+        // Auto-hide after 10s if not confirmed
+        setTimeout(() => { toast.classList.remove('show'); }, 10000);
+    }
+
+    // Allow closing toast manually
+    const toastCloseBtn = document.getElementById('toast-close');
+    if (toastCloseBtn) {
+        toastCloseBtn.onclick = function() {
+            const toast = document.getElementById('toast');
+            if (toast) toast.classList.remove('show');
+        };
+    }
+    </script>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Enhanced Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Navigation</h3>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link active">
+                            <i class="fas fa-tachometer-alt sidebar-nav-icon"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="consent.html" class="sidebar-nav-link">
+                            <i class="fas fa-handshake sidebar-nav-icon"></i>
+                            <span>Consents</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link">
+                            <i class="fas fa-history sidebar-nav-icon"></i>
+                            <span>History</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="connected_apps.html" class="sidebar-nav-link">
+                            <i class="fas fa-link sidebar-nav-icon"></i>
+                            <span>Connected Apps</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Account</h3>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="profile.html" class="sidebar-nav-link">
+                            <i class="fas fa-user-circle sidebar-nav-icon"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link">
+                            <i class="fas fa-cog sidebar-nav-icon"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link">
+                            <i class="fas fa-shield-check sidebar-nav-icon"></i>
+                            <span>Privacy</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Support</h3>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link">
+                            <i class="fas fa-question-circle sidebar-nav-icon"></i>
+                            <span>Help Center</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link">
+                            <i class="fas fa-envelope sidebar-nav-icon"></i>
+                            <span>Contact</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast" role="alert" aria-live="polite" aria-atomic="true">
+        <span class="toast-icon"><i class="fas fa-bell"></i></span>
+        <span id="toast-message">This is a notification.</span>
+        <button class="toast-close" id="toast-close" title="Close notification">&times;</button>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-grid">
+            <!-- Stats Cards -->
+            <div class="stats-grid fade-in">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-title">Active Consents</div>
+                            <div class="stat-card-value" id="activeConsents">0</div>
+                            <div class="stat-card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+12% from last month</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-icon success">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-title">Revoked Consents</div>
+                            <div class="stat-card-value" id="revokedConsents">0</div>
+                            <div class="stat-card-change negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>-5% from last month</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-icon danger">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-title">Data Access Requests</div>
+                            <div class="stat-card-value" id="dataAccessRequests">0</div>
+                            <div class="stat-card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+8% from last month</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-icon info">
+                            <i class="fas fa-database"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div>
+                            <div class="stat-card-title">Total Consents</div>
+                            <div class="stat-card-value" id="totalConsents">0</div>
+                            <div class="stat-card-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+15% from last month</span>
+                            </div>
+                        </div>
+                        <div class="stat-card-icon warning">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Consents -->
+            <div class="content-card fade-in">
+                <div class="content-card-header">
+                    <h2 class="content-card-title">
+                        <div class="content-card-icon">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        Recent Consent Activity
+                    </h2>
+                </div>
+                <div class="content-card-body">
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Partner</th>
+                                    <th>Action</th>
+                                    <th>Status</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="consentHistoryTable">
+                                <!-- Table rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="chart-grid fade-in">
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h3 class="content-card-title">
+                            <div class="content-card-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            Consent Distribution
+                        </h3>
+                    </div>
+                    <div class="content-card-body">
+                        <div class="chart-container">
+                            <canvas id="consentPieChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="content-card">
+                    <div class="content-card-header">
+                        <h3 class="content-card-title">
+                            <div class="content-card-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            Consent Trends
+                        </h3>
+                    </div>
+                    <div class="content-card-body">
+                        <div class="chart-container">
+                            <canvas id="consentLineChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // SoundManager for notification sounds (from auth.html style)
+        class SoundManager {
+            constructor() {
+                this.enabled = localStorage.getItem('sv_sound_enabled') !== 'false';
+                this.initSounds();
+            }
+            initSounds() {
+                this.audioContext = null;
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    // Web Audio API not supported
+                }
+            }
+            playTone(frequency, duration, type = 'sine') {
+                if (!this.enabled || !this.audioContext) return;
+                try {
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                    oscillator.type = type;
+                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                } catch (e) {}
+            }
+            notification() {
+                this.playTone(1000, 0.15);
+            }
+        }
+
+        // Create a single instance for dashboard
+        const soundManager = new SoundManager();
+        // Application State
+        const app = {
+            theme: localStorage.getItem('sv_theme') || 'light',
+            sidebarOpen: false,
+            data: {
+                activeConsents: 142,
+                revokedConsents: 23,
+                dataAccessRequests: 67,
+                totalConsents: 165,
+                notifications: 3,
+                consentHistory: [
+                    {
+                        date: '2024-07-15 14:30',
+                        partner: 'HealthTech Solutions',
+                        action: 'Medical Data Access',
+                        status: 'approved',
+                        details: 'Access granted for health records'
+                    },
+                    {
+                        date: '2024-07-15 12:15',
+                        partner: 'FinanceApp Pro',
+                        action: 'Transaction History',
+                        status: 'revoked',
+                        details: 'User revoked access to transaction data'
+                    },
+                    {
+                        date: '2024-07-15 09:45',
+                        partner: 'SocialConnect',
+                        action: 'Profile Sharing',
+                        status: 'blocked',
+                        details: 'Suspicious activity detected and blocked'
+                    },
+                    {
+                        date: '2024-07-14 16:20',
+                        partner: 'EduPlatform',
+                        action: 'Academic Records',
+                        status: 'approved',
+                        details: 'Access granted for transcript verification'
+                    },
+                    {
+                        date: '2024-07-14 11:30',
+                        partner: 'TravelBooking',
+                        action: 'Location Data',
+                        status: 'approved',
+                        details: 'Location access for travel recommendations'
+                    }
+                ]
+            }
+        };
+
+        // DOM Elements
+        const elements = {
+            themeToggle: document.getElementById('themeToggle'),
+            sidebarToggle: document.getElementById('sidebarToggle'),
+            sidebar: document.getElementById('sidebar'),
+            overlay: document.getElementById('overlay'),
+            mainContent: document.getElementById('mainContent'),
+            notificationBtn: document.getElementById('notificationBtn'),
+            notificationCount: document.getElementById('notificationCount'),
+            activeConsents: document.getElementById('activeConsents'),
+            revokedConsents: document.getElementById('revokedConsents'),
+            dataAccessRequests: document.getElementById('dataAccessRequests'),
+            totalConsents: document.getElementById('totalConsents'),
+            consentHistoryTable: document.getElementById('consentHistoryTable')
+        };
+
+        // Theme Management
+
+        function initTheme() {
+            document.documentElement.setAttribute('data-theme', app.theme);
+            updateThemeIcon();
+        }
+
+        function toggleTheme() {
+            app.theme = app.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', app.theme);
+            localStorage.setItem('sv_theme', app.theme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = elements.themeToggle.querySelector('i');
+            icon.className = app.theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            elements.themeToggle.title = app.theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+        }
+
+        // Sidebar Management
+        function toggleSidebar() {
+            app.sidebarOpen = !app.sidebarOpen;
+            elements.sidebar.classList.toggle('open', app.sidebarOpen);
+            elements.overlay.classList.toggle('active', app.sidebarOpen);
+            elements.mainContent.classList.toggle('sidebar-open', app.sidebarOpen);
+        }
+
+        function closeSidebar() {
+            app.sidebarOpen = false;
+            elements.sidebar.classList.remove('open');
+            elements.overlay.classList.remove('active');
+            elements.mainContent.classList.remove('sidebar-open');
+        }
+
+        // Data Updates
+        function updateDashboardStats() {
+            elements.activeConsents.textContent = app.data.activeConsents;
+            elements.revokedConsents.textContent = app.data.revokedConsents;
+            elements.dataAccessRequests.textContent = app.data.dataAccessRequests;
+            elements.totalConsents.textContent = app.data.totalConsents;
+            elements.notificationCount.textContent = app.data.notifications;
+        }
+
+        function populateConsentHistory(filteredList) {
+            const tbody = elements.consentHistoryTable;
+            tbody.innerHTML = '';
+            const list = filteredList || app.data.consentHistory;
+            list.forEach(consent => {
+                const row = document.createElement('tr');
+                const statusClass = consent.status === 'approved' ? 'success' : 
+                                  consent.status === 'revoked' ? 'danger' : 'warning';
+                const statusIcon = consent.status === 'approved' ? 'check' : 
+                                 consent.status === 'revoked' ? 'times' : 'exclamation-triangle';
+                row.innerHTML = `
+                    <td>${consent.date}</td>
+                    <td><strong>${consent.partner}</strong></td>
+                    <td>${consent.action}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            <i class="fas fa-${statusIcon}"></i>
+                            ${consent.status.charAt(0).toUpperCase() + consent.status.slice(1)}
+                        </span>
+                    </td>
+                    <td>${consent.details}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Charts
+        function initCharts() {
+            // Pie Chart
+            const pieCtx = document.getElementById('consentPieChart').getContext('2d');
+            new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Active', 'Revoked', 'Pending', 'Expired'],
+                    datasets: [{
+                        data: [142, 23, 15, 8],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(239, 68, 68, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(107, 114, 128, 0.8)'
+                        ],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-primary')
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Line Chart
+            const lineCtx = document.getElementById('consentLineChart').getContext('2d');
+            new Chart(lineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Total Consents',
+                        data: [85, 95, 110, 125, 140, 155, 165],
+                        borderColor: 'rgba(99, 102, 241, 1)',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: 'rgba(99, 102, 241, 1)',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--border-light')
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--border-light')
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.documentElement).getPropertyValue('--text-secondary')
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event Listeners
+        function initEventListeners() {
+            elements.themeToggle.addEventListener('click', toggleTheme);
+            elements.sidebarToggle.addEventListener('click', toggleSidebar);
+            elements.overlay.addEventListener('click', closeSidebar);
+            
+            elements.notificationBtn.addEventListener('click', () => {
+                showToast('You have ' + app.data.notifications + ' new notifications!');
+            });
+        // Toast Notification Logic
+        function showToast(message, timeout = 3000) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastClose = document.getElementById('toast-close');
+            toastMsg.textContent = message;
+            toast.classList.add('show');
+            // Play notification sound
+            if (typeof soundManager !== 'undefined') soundManager.notification();
+            // Remove previous click listeners
+            toastClose.onclick = function() {
+                toast.classList.remove('show');
+            };
+            // Auto-hide after timeout
+            if (showToast._timeout) clearTimeout(showToast._timeout);
+            showToast._timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, timeout);
+        }
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && app.sidebarOpen) {
+                    closeSidebar();
+                }
+                if (e.ctrlKey && e.key === 'k') {
+                    e.preventDefault();
+                    document.querySelector('.search-input').focus();
+                }
+            });
+
+            // Search functionality
+            document.querySelector('.search-input').addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const filtered = app.data.consentHistory.filter(consent => {
+                    return (
+                        consent.date.toLowerCase().includes(query) ||
+                        consent.partner.toLowerCase().includes(query) ||
+                        consent.action.toLowerCase().includes(query) ||
+                        consent.status.toLowerCase().includes(query) ||
+                        consent.details.toLowerCase().includes(query)
+                    );
+                });
+                populateConsentHistory(filtered);
+            });
+        }
+
+        // Initialize Application
+        function init() {
+            initTheme();
+            updateDashboardStats();
+            populateConsentHistory();
+            initCharts();
+            initEventListeners();
+            // Add fade-in animation to elements
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach(el => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                });
+            }, 100);
+        }
+
+
+        // Set dashboard avatar initial from username in localStorage
+        function setDashboardAvatarInitial() {
+            const avatar = document.getElementById('dashboard-avatar');
+            let uname = localStorage.getItem('sv_username');
+            let initial = (uname && uname.length > 0) ? uname.trim()[0].toUpperCase() : 'U';
+            avatar.textContent = initial;
+        }
+
+        // Start the application
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            setDashboardAvatarInitial();
+        });
+
+        // Auto-refresh data every 30 seconds
+        setInterval(() => {
+            // Simulate data updates
+            app.data.notifications = Math.floor(Math.random() * 10);
+            elements.notificationCount.textContent = app.data.notifications;
+        }, 30000);
+    </script>
+</body>
+</html>

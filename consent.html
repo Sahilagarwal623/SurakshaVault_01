@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consent Management | SurakshaVault</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light Mode Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+            
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-inverse: #ffffff;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-overlay: rgba(0, 0, 0, 0.5);
+            
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --border-focus: #6366f1;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            
+            --navbar-height: 4rem;
+        }
+
+        /* Dark Mode Colors */
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --primary-light: #c7d2fe;
+            --secondary: #34d399;
+            --accent: #fbbf24;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --success: #34d399;
+            --info: #60a5fa;
+            
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --text-inverse: #111827;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            --bg-overlay: rgba(0, 0, 0, 0.8);
+            
+            --border: #334155;
+            --border-light: #475569;
+            --border-focus: #818cf8;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Enhanced Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--navbar-height);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .brand-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: var(--navbar-height);
+            padding: 2rem;
+            min-height: calc(100vh - var(--navbar-height));
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 2rem;
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .content-card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .content-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content-card-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .content-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: var(--bg-card);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background: var(--bg-card);
+            border-color: var(--primary-light);
+        }
+
+        .checkbox-item.selected {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+        }
+
+        .checkbox-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .checkbox-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--primary);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Calendar Styling */
+        .calendar-container {
+            position: relative;
+        }
+
+        .calendar-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            padding-right: 2.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: var(--bg-card);
+        }
+
+        .calendar-icon {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        /* Messages and Notes */
+        .message-container {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid var(--primary-light);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .message-icon {
+            color: var(--primary);
+            font-size: 1.125rem;
+        }
+
+        .message-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .message-content {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        .note-container {
+            background: var(--bg-tertiary);
+            border-left: 4px solid var(--accent);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .note-title {
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .note-content {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .status-badge.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Fade-in Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(1rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-container {
+                padding: 0 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-container {
+                padding: 0 0.75rem;
+            }
+            
+            .main-content {
+                padding: 0.75rem;
+            }
+        }
+
+        /* Hidden elements */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .progress-step {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .progress-step.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .progress-step.completed {
+            background: var(--success);
+            color: white;
+        }
+
+        .progress-step.inactive {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+        }
+
+        .step-divider {
+            width: 2rem;
+            height: 2px;
+            background: var(--border);
+        }
+
+        .step-divider.completed {
+            background: var(--success);
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <!-- Enhanced Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="#" class="brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <span class="brand-text">SurakshaVault</span>
+                </a>
+            </div>
+            
+            <div class="navbar-right">
+                <button class="navbar-btn" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                
+                <div class="user-avatar" id="userAvatar" title="User Menu">U</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Progress Steps -->
+        <div class="progress-steps">
+            <div class="progress-step active" id="step1">
+                <i class="fas fa-sign-in-alt"></i>
+                <span>Login</span>
+            </div>
+            <div class="step-divider" id="divider1"></div>
+            <div class="progress-step inactive" id="step2">
+                <i class="fas fa-building"></i>
+                <span>Select Companies</span>
+            </div>
+            <div class="step-divider" id="divider2"></div>
+            <div class="progress-step inactive" id="step3">
+                <i class="fas fa-handshake"></i>
+                <span>Review Consent</span>
+            </div>
+            <div class="step-divider" id="divider3"></div>
+            <div class="progress-step inactive" id="step4">
+                <i class="fas fa-check-circle"></i>
+                <span>Complete</span>
+            </div>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <div class="content-card fade-in" id="loginForm">
+            <div class="content-card-header">
+                <h2 class="content-card-title">
+                    <div class="content-card-icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </div>
+                    Partner Portal Login
+                </h2>
+            </div>
+            <div class="content-card-body">
+                <div class="message-container">
+                    <div class="message-header">
+                        <i class="fas fa-info-circle message-icon"></i>
+                        <span class="message-title">Welcome to SurakshaVault</span>
+                    </div>
+                    <div class="message-content">
+                        Please log in to access the consent management portal. Your credentials are securely encrypted and protected.
+                    </div>
+                </div>
+
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label class="form-label" for="loginUsername">
+                            <i class="fas fa-user"></i> Username
+                        </label>
+                        <input type="text" id="loginUsername" class="form-input" placeholder="Enter your username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="loginPassword">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <input type="password" id="loginPassword" class="form-input" placeholder="Enter your password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Log In
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- COMPANY LIST -->
+        <div class="content-card fade-in hidden" id="companyList">
+            <div class="content-card-header">
+                <h2 class="content-card-title">
+                    <div class="content-card-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    Select Partner Companies
+                </h2>
+            </div>
+            <div class="content-card-body">
+                <div class="message-container">
+                    <div class="message-header">
+                        <i class="fas fa-handshake message-icon"></i>
+                        <span class="message-title">Choose Your Partners</span>
+                    </div>
+                    <div class="message-content">
+                        Select the companies you want to share your data with. You can choose multiple partners and manage their access individually.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Available Companies</label>
+                    <div id="companies" class="checkbox-group"></div>
+                </div>
+
+                <div class="note-container">
+                    <div class="note-title">
+                        <i class="fas fa-sticky-note"></i>
+                        Important Note
+                    </div>
+                    <div class="note-content">
+                        Each company may request different types of data. Review their consent requirements carefully before proceeding.
+                    </div>
+                </div>
+                
+                <button id="applyBtn" class="btn btn-primary btn-full">
+                    <i class="fas fa-arrow-right"></i>
+                    Apply for Consent
+                </button>
+            </div>
+        </div>
+
+        <!-- CONSENT REQUEST DETAILS -->
+        <div class="content-card fade-in hidden" id="consentRequest">
+            <div class="content-card-header">
+                <h2 class="content-card-title">
+                    <div class="content-card-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    Consent Request Details
+                </h2>
+            </div>
+            <div class="content-card-body">
+                <div class="message-container">
+                    <div class="message-header">
+                        <i class="fas fa-exclamation-triangle message-icon"></i>
+                        <span class="message-title">Data Access Request</span>
+                    </div>
+                    <div class="message-content" id="consentDetails">
+                        Loading consent details...
+                    </div>
+                </div>
+
+                <div class="note-container">
+                    <div class="note-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Privacy Protection
+                    </div>
+                    <div class="note-content">
+                        Your data is encrypted and will only be accessible to authorized personnel. You can revoke access at any time through your dashboard.
+                    </div>
+                </div>
+                
+                <button id="giveConsentBtn" class="btn btn-success btn-full">
+                    <i class="fas fa-check"></i>
+                    Proceed with Consent
+                </button>
+            </div>
+        </div>
+
+        <!-- USER CONSENT FORM -->
+        <div class="content-card fade-in hidden" id="userConsentForm">
+            <div class="content-card-header">
+                <h2 class="content-card-title">
+                    <div class="content-card-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    Configure Your Consent
+                </h2>
+            </div>
+            <div class="content-card-body">
+                <form id="userConsentFormElement">
+                    <div class="message-container">
+                        <div class="message-header">
+                            <i class="fas fa-cog message-icon"></i>
+                            <span class="message-title">Customize Data Sharing</span>
+                        </div>
+                        <div class="message-content">
+                            Configure which data fields to share and set access permissions. All settings can be modified later from your dashboard.
+                        </div>
+                    </div>
+
+                    <div id="userConsentFields"></div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-globe"></i> Select Accessible Locations
+                        </label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="locations" value="India" class="checkbox-input">
+                                <span class="checkbox-label">🇮🇳 India</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="locations" value="United States" class="checkbox-input">
+                                <span class="checkbox-label">🇺🇸 United States</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="locations" value="United Kingdom" class="checkbox-input">
+                                <span class="checkbox-label">🇬🇧 United Kingdom</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="locations" value="Canada" class="checkbox-input">
+                                <span class="checkbox-label">🇨🇦 Canada</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="locations" value="Australia" class="checkbox-input">
+                                <span class="checkbox-label">🇦🇺 Australia</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="consentDateTime">
+                            <i class="fas fa-calendar-alt"></i> Consent Expiry Date & Time
+                        </label>
+                        <div class="calendar-container">
+                            <input type="datetime-local" id="consentDateTime" class="calendar-input" required>
+                            <i class="fas fa-calendar-alt calendar-icon"></i>
+                        </div>
+                        <div class="note-container" style="margin-top: 0.5rem;">
+                            <div class="note-title">
+                                <i class="fas fa-clock"></i>
+                                Expiry Information
+                            </div>
+                            <div class="note-content">
+                                Set when this consent should automatically expire. You can extend or revoke access before this date through your dashboard.
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-full">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit Consent
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- CONFIRMATION MESSAGE -->
+        <div class="content-card fade-in hidden" id="confirmation">
+            <div class="content-card-header">
+                <h2 class="content-card-title">
+                    <div class="content-card-icon" style="background: var(--success);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    Consent Successfully Created
+                </h2>
+            </div>
+            <div class="content-card-body">
+                <div class="message-container" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(52, 211, 153, 0.1)); border-color: var(--success);">
+                    <div class="message-header">
+                        <i class="fas fa-check-circle message-icon" style="color: var(--success);"></i>
+                        <span class="message-title">Consent Activated</span>
+                    </div>
+                    <div class="message-content" id="confirmText">
+                        Your consent has been successfully processed and is now active.
+                    </div>
+                </div>
+
+                <div class="note-container">
+                    <div class="note-title">
+                        <i class="fas fa-info-circle"></i>
+                        Next Steps
+                    </div>
+                    <div class="note-content">
+                        You can monitor and manage your consents through the dashboard. You'll receive notifications for any data access requests.
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button onclick="window.location.href='dashboard.html'" class="btn btn-primary" style="flex: 1;">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Go to Dashboard
+                    </button>
+                    <button onclick="location.reload()" class="btn btn-secondary" style="flex: 1;">
+                        <i class="fas fa-plus"></i>
+                        Create Another Consent
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Theme Management
+        const themeToggle = document.getElementById('themeToggle');
+        const userAvatar = document.getElementById('userAvatar');
+        let currentTheme = localStorage.getItem('sv_theme') || 'light';
+
+        function initTheme() {
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            updateThemeIcon();
+        }
+
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('sv_theme', currentTheme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = themeToggle.querySelector('i');
+            icon.className = currentTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            themeToggle.title = currentTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+        }
+
+        // Progress Steps Management
+        function updateProgressStep(stepNumber) {
+            const steps = ['step1', 'step2', 'step3', 'step4'];
+            const dividers = ['divider1', 'divider2', 'divider3'];
+            
+            steps.forEach((stepId, index) => {
+                const step = document.getElementById(stepId);
+                if (index + 1 < stepNumber) {
+                    step.className = 'progress-step completed';
+                } else if (index + 1 === stepNumber) {
+                    step.className = 'progress-step active';
+                } else {
+                    step.className = 'progress-step inactive';
+                }
+            });
+
+            dividers.forEach((dividerId, index) => {
+                const divider = document.getElementById(dividerId);
+                if (index + 1 < stepNumber) {
+                    divider.className = 'step-divider completed';
+                } else {
+                    divider.className = 'step-divider';
+                }
+            });
+        }
+
+        // Checkbox styling
+        function initCheckboxStyling() {
+            document.addEventListener('change', function(e) {
+                if (e.target.type === 'checkbox') {
+                    const item = e.target.closest('.checkbox-item');
+                    if (item) {
+                        if (e.target.checked) {
+                            item.classList.add('selected');
+                        } else {
+                            item.classList.remove('selected');
+                        }
+                    }
+                }
+            });
+        }
+
+        // Set user avatar
+        function setUserAvatar() {
+            const username = localStorage.getItem('sv_username');
+            if (username) {
+                userAvatar.textContent = username.charAt(0).toUpperCase();
+            }
+        }
+
+        // Original functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            initTheme();
+            initCheckboxStyling();
+            setUserAvatar();
+            
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            const apiBase = 'http://192.168.230.123:8080';
+            let consentModel = null;
+            const username = localStorage.getItem('sv_username');
+            const token = localStorage.getItem('sv_token');
+
+            if (!username || !token) {
+                alert('User not logged in. Please log in first.');
+                return;
+            }
+
+            document.getElementById('loginForm').classList.add('hidden');
+            updateProgressStep(2);
+            loadCompanies();
+
+            async function loadCompanies() {
+                try {
+                    const resp = await fetch(`${apiBase}/auth/getAllCompanies`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (!resp.ok) throw new Error('Failed to load companies');
+                    
+                    const list = await resp.json();
+                    const div = document.getElementById('companies');
+                    div.innerHTML = '';
+                    
+                    list.forEach(c => {
+                        const label = document.createElement('label');
+                        label.className = 'checkbox-item';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.value = c.username;
+                        checkbox.name = 'companies';
+                        checkbox.className = 'checkbox-input';
+                        
+                        const span = document.createElement('span');
+                        span.className = 'checkbox-label';
+                        span.textContent = c.username;
+                        
+                        label.appendChild(checkbox);
+                        label.appendChild(span);
+                        div.appendChild(label);
+                    });
+                    
+                    document.getElementById('companyList').classList.remove('hidden');
+                } catch (error) {
+                    alert('Failed to load companies: ' + error.message);
+                }
+            }
+
+            document.getElementById('applyBtn').addEventListener('click', async () => {
+                const selected = Array.from(document.querySelectorAll('input[name="companies"]:checked')).map(cb => cb.value);
+                if (!selected.length) {
+                    alert('Please select at least one company');
+                    return;
+                }
+                
+                try {
+                    consentModel = await fetchConsent(selected[0]);
+                    const labelMap = {
+                        isAskingAdhaarNumber: 'Adhaar Number',
+                        isAskingPanNumber: 'PAN Number',
+                        isAskingAnnualIncome: 'Annual Salary',
+                        isAskingCibilScore: 'CIBIL Score',
+                        isAskingTransactions: 'Transactions',
+                        isAskingAccountNumber: 'Account Number',
+                        isAskingCardNumber: 'Card Number'
+                    };
+                    
+                    const requested = Object.entries(consentModel)
+                        .filter(([k, v]) => v === true && labelMap[k])
+                        .map(([k]) => labelMap[k]);
+                    
+                    document.getElementById('consentDetails').innerHTML = `
+                        <strong>Data fields requested:</strong><br>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            ${requested.map(field => `<li>${field}</li>`).join('')}
+                        </ul>
+                    `;
+                    
+                    document.getElementById('companyList').classList.add('hidden');
+                    document.getElementById('consentRequest').classList.remove('hidden');
+                    updateProgressStep(3);
+                } catch (error) {
+                    alert('Error fetching consent details: ' + error.message);
+                }
+            });
+
+            async function fetchConsent(company) {
+                const resp = await fetch(`${apiBase}/consents/${encodeURIComponent(company)}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!resp.ok) throw new Error('Error fetching consent');
+                return resp.json();
+            }
+
+            document.getElementById('giveConsentBtn').addEventListener('click', () => {
+                const container = document.getElementById('userConsentFields');
+                container.innerHTML = '';
+                
+                const mapField = [
+                    ['Adhaar Number','isAskingAdhaarNumber','showAdhaarNumber','checkbox'],
+                    ['PAN Number','isAskingPanNumber','showPanNumber','checkbox'],
+                    ['Annual Salary','isAskingAnnualIncome','salaryEncryptedBits','number'],
+                    ['CIBIL Score','isAskingCibilScore','cibilEncryptedBits','number'],
+                    ['Transactions','isAskingTransactions','showTransactions','checkbox'],
+                    ['Account Number','isAskingAccountNumber','showAccountNumber','checkbox'],
+                    ['Card Number','isAskingCardNumber','showCardNumber','checkbox']
+                ];
+                
+                mapField.forEach(([label, askKey, consentKey, type]) => {
+                    if (consentModel[askKey]) {
+                        const formGroup = document.createElement('div');
+                        formGroup.className = 'form-group';
+                        
+                        const labelElement = document.createElement('label');
+                        labelElement.className = 'form-label';
+                        labelElement.textContent = label;
+                        
+                        const input = document.createElement('input');
+                        input.type = type;
+                        input.id = consentKey;
+                        input.className = 'form-input';
+                        
+                        if (type === 'checkbox') {
+                            input.className = 'checkbox-input';
+                            const checkboxItem = document.createElement('label');
+                            checkboxItem.className = 'checkbox-item';
+                            
+                            const span = document.createElement('span');
+                            span.className = 'checkbox-label';
+                            span.textContent = `Share ${label}`;
+                            
+                            checkboxItem.appendChild(input);
+                            checkboxItem.appendChild(span);
+                            formGroup.appendChild(labelElement);
+                            formGroup.appendChild(checkboxItem);
+                        } else {
+                            // Custom placeholder for annual salary
+                            if (consentKey === 'salaryEncryptedBits') {
+                                input.placeholder = 'Enter salary encrypted bits';
+                            } else {
+                                input.placeholder = `Enter ${label.toLowerCase()}`;
+                            }
+                            formGroup.appendChild(labelElement);
+                            formGroup.appendChild(input);
+                        }
+                        
+                        container.appendChild(formGroup);
+                    }
+                });
+                
+                document.getElementById('consentRequest').classList.add('hidden');
+                document.getElementById('userConsentForm').classList.remove('hidden');
+            });
+
+            document.getElementById('userConsentFormElement').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const token = localStorage.getItem('sv_token');
+                const username = localStorage.getItem('sv_username');
+                // Find selected company (from previous step)
+                let companyName = null;
+                const checkedCompanies = document.querySelectorAll('input[name="companies"]:checked');
+                if (checkedCompanies.length > 0) {
+                    companyName = checkedCompanies[0].value;
+                } else if (window.consentModel && window.consentModel.companyName) {
+                    companyName = window.consentModel.companyName;
+                }
+                // Build consent object
+                const consent = { id: { username, companyName } };
+                // Boolean fields
+                const fieldLabels = {
+                    showAdhaarNumber: 'Adhaar Number',
+                    showPanNumber: 'PAN Number',
+                    showTransactions: 'Transactions',
+                    showAccountNumber: 'Account Number',
+                    showCardNumber: 'Card Number'
+                };
+                let sharedFields = [];
+                Object.keys(fieldLabels).forEach(key => {
+                    const el = document.getElementById(key);
+                    consent[key] = el ? el.checked : false;
+                    if (el && el.checked) sharedFields.push(fieldLabels[key]);
+                });
+                // Numeric fields
+                const salaryEl = document.getElementById('salaryEncryptedBits');
+                const cibilEl = document.getElementById('cibilEncryptedBits');
+                consent.salaryEncryptedBits = salaryEl ? Number(salaryEl.value) : 0;
+                let cibilVal = cibilEl ? cibilEl.value : '';
+                if (cibilEl) {
+                    if (cibilVal === '' || cibilVal === '0' || Number(cibilVal) === 0) {
+                        consent.cibilEncryptedBits = 1000;
+                        sharedFields.push('CIBIL Score');
+                    } else {
+                        consent.cibilEncryptedBits = Number(cibilVal);
+                        sharedFields.push('CIBIL Score');
+                    }
+                } else {
+                    consent.cibilEncryptedBits = 0;
+                }
+                // Locations (checkboxes)
+                const locations = Array.from(document.querySelectorAll('input[name="locations"]:checked')).map(cb => cb.value);
+                consent.locations = locations.length > 0 ? locations : [''];
+                // DateTime
+                const dtEl = document.getElementById('consentDateTime');
+                consent.localDateTime = dtEl ? new Date(dtEl.value).toISOString() : new Date().toISOString();
+
+                // Send to backend
+                try {
+                    const resp = await fetch(`${apiBase}/user-consent`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(consent)
+                    });
+                    if (!resp.ok) throw new Error('Error submitting consent');
+                    //const result = await resp.json();
+                    document.getElementById('userConsentForm').classList.add('hidden');
+                    document.getElementById('confirmation').classList.remove('hidden');
+                    updateProgressStep(4);
+                    // Show only shared fields and valid until
+                    const validUntil = dtEl ? new Date(dtEl.value).toLocaleString() : '';
+                    document.getElementById('confirmText').innerHTML = `
+                        <div style="margin-bottom: 1rem;">
+                            <strong>Fields shared:</strong> ${sharedFields.filter(Boolean).join(', ') || 'None'}<br>
+                            <strong>Valid until:</strong> ${validUntil}
+                        </div>
+                    `;
+                } catch (err) {
+                    alert('Error submitting consent: ' + err.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

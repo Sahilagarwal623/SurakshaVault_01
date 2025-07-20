@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SurakshaVault - Secure Authentication Portal</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Improve textarea appearance for description and address in partner registration */
+        #enterpriseInfoFormFields textarea#description,
+        #enterpriseInfoFormFields textarea#address {
+            min-height: 60px;
+            max-height: 180px;
+            resize: vertical;
+            padding: 0.75rem 1rem 0.75rem 2.75rem; /* Add left padding for icon */
+            font-size: 0.95rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            transition: border-color 0.2s;
+        }
+
+        /* Adjust icon position for textarea input-group */
+        #enterpriseInfoFormFields .input-group textarea + .input-icon,
+        #enterpriseInfoFormFields .input-group textarea ~ .input-icon {
+            left: 1rem;
+            top: 1.1rem;
+        }
+        #enterpriseInfoFormFields .input-group textarea {
+            padding-left: 2.75rem;
+        }
+        #enterpriseInfoFormFields textarea#description:focus,
+        #enterpriseInfoFormFields textarea#address:focus {
+            border-color: var(--primary);
+            outline: none;
+            background: var(--bg-card);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light Mode Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+            
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-inverse: #ffffff;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-overlay: rgba(0, 0, 0, 0.5);
+            
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --border-focus: #6366f1;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+        }
+
+        /* Dark Mode Colors */
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --primary-light: #c7d2fe;
+            --secondary: #34d399;
+            --accent: #fbbf24;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --success: #34d399;
+            --info: #60a5fa;
+            
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --text-inverse: #111827;
+            
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            --bg-overlay: rgba(0, 0, 0, 0.8);
+            
+            --border: #334155;
+            --border-light: #475569;
+            --border-focus: #818cf8;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Initial Loader */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-card {
+            background: var(--bg-primary);
+            padding: 2rem 2.8rem;
+            
+            /*box-shadow: var(--shadow-xl); */
+           /* border: 1px solid var(--border); */
+        }
+
+        .loader {
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 25px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .loader p {
+            margin: 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .words {
+            overflow: hidden;
+            position: relative;
+            height: 2.5rem;
+            width: 8.2rem;
+        }
+
+        .words::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                var(--bg-primary) 20%,
+                transparent 30%,
+                transparent 70%,
+                var(--bg-primary) 90%
+            );
+            z-index: 20;
+        }
+
+        .word {
+            display: block;
+            height: 120%;
+            padding-left: 0.5rem;
+            color: white;
+            animation: spin_words 4s infinite;
+            font-weight: 300;
+        }
+
+        @keyframes spin_words {
+            10% { transform: translateY(-102%); }
+            25% { transform: translateY(-100%); }
+            35% { transform: translateY(-202%); }
+            50% { transform: translateY(-200%); }
+            60% { transform: translateY(-302%); }
+            75% { transform: translateY(-300%); }
+            85% { transform: translateY(-402%); }
+            100% { transform: translateY(-400%); }
+        }
+
+        /* Background Animation */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-shapes {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0.05;
+            animation: float 20s infinite linear;
+        }
+
+        .shape-1 { width: 80px; height: 80px; top: 20%; left: 10%; animation-delay: 0s; }
+        .shape-2 { width: 120px; height: 120px; top: 60%; right: 15%; animation-delay: -5s; }
+        .shape-3 { width: 60px; height: 60px; top: 80%; left: 20%; animation-delay: -10s; }
+        .shape-4 { width: 100px; height: 100px; top: 30%; right: 30%; animation-delay: -15s; }
+        .shape-5 { width: 140px; height: 140px; top: 10%; right: 5%; animation-delay: -7s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(30px) rotate(240deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        /* Main Container */
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            max-width: 28rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .auth-wrapper::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(2rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: var(--shadow-md);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: var(--shadow-lg);
+            }
+        }
+
+        .logo h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        /* Content Area */
+        .content-area {
+            min-height: 25rem;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            opacity: 0;
+            transform: translateX(2rem);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .screen-content {
+            padding: 2rem;
+        }
+
+        .screen-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .back-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            transition: all 0.3s ease;
+            position: absolute;
+            left: 0;
+            z-index: 10;
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            background: var(--bg-secondary);
+            border-color: var(--border-focus);
+            transform: translateX(-2px);
+        }
+
+        .screen-title {
+            flex: 1;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .screen-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+
+        /* Role Selection Buttons */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .role-btn {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .role-btn:hover::before {
+            left: 100%;
+        }
+
+        .role-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-focus);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .role-icon {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .role-icon i {
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .role-content {
+            flex: 1;
+            text-align: left;
+        }
+
+        .role-title {
+            display: block;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .role-desc {
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+        }
+
+        .role-arrow {
+            color: var(--text-muted);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .role-btn:hover .role-arrow {
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        /* Form Styles */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-muted);
+            z-index: 2;
+            transition: color 0.3s ease;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 2.75rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            background: var(--bg-tertiary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .input-group input:focus + .input-icon,
+        .input-group:focus-within .input-icon {
+            color: var(--primary);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
+            background: var(--bg-tertiary);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .submit-btn.loading .btn-text {
+            opacity: 0;
+        }
+
+        .submit-btn.loading .btn-loader {
+            opacity: 1;
+        }
+
+        .submit-btn .spinner {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Form Footer */
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+        }
+
+        .link-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: none;
+            font-size: inherit;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .link-btn:hover {
+            color: var(--primary-dark);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .forgot-link {
+            margin-bottom: 1rem;
+            display: inline-flex;
+        }
+
+        /* Password Strength Indicator */
+        .password-strength {
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .strength-text {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.4s ease;
+            border-radius: var(--radius-sm);
+        }
+
+        .strength-weak { background: var(--danger); width: 25%; }
+        .strength-fair { background: var(--warning); width: 50%; }
+        .strength-good { background: var(--info); width: 75%; }
+        .strength-strong { background: var(--success); width: 100%; }
+
+        /* Success Screen */
+        .success-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .success-icon {
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(135deg, var(--success), #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            animation: successPulse 2s infinite;
+            box-shadow: var(--shadow-md);
+        }
+
+        .success-icon i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        @keyframes successPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: var(--shadow-md);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: var(--shadow-lg);
+            }
+        }
+
+        .success-message {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Token Display */
+        .token-container {
+            margin-bottom: 2rem;
+        }
+
+        .token-container h3 {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .token-display {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        .token-display pre {
+            color: var(--primary);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .copy-btn {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1rem;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.8125rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-overlay);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-2xl);
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-spinner {
+            position: relative;
+            width: 4rem;
+            height: 4rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .spinner-ring:nth-child(2) {
+            width: 75%;
+            height: 75%;
+            top: 12.5%;
+            left: 12.5%;
+            border-top-color: var(--secondary);
+            animation-duration: 1s;
+            animation-direction: reverse;
+        }
+
+        .spinner-ring:nth-child(3) {
+            width: 50%;
+            height: 50%;
+            top: 25%;
+            left: 25%;
+            border-top-color: var(--accent);
+            animation-duration: 0.8s;
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            animation: fadeInOut 2s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* Alert System */
+        .alert-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            max-width: 24rem;
+        }
+
+        .alert {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideInAlert 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert.success {
+            border-left-color: var(--success);
+        }
+
+        .alert.info {
+            border-left-color: var(--info);
+        }
+
+        .alert.warning {
+            border-left-color: var(--warning);
+        }
+
+        @keyframes slideInAlert {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .auth-wrapper {
+                max-width: 100%;
+                border-radius: var(--radius-xl);
+            }
+
+            .header {
+                padding: 2rem 1.5rem 1.5rem;
+            }
+
+            .logo h1 {
+                font-size: 1.75rem;
+            }
+
+            .screen-content {
+                padding: 1.5rem;
+            }
+
+            .role-btn {
+                padding: 1.25rem;
+            }
+
+            .role-title {
+                font-size: 1rem;
+            }
+
+            .alert-container {
+                top: 1rem;
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 1.5rem 1rem 1rem;
+            }
+
+            .logo {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .logo-icon {
+                width: 3rem;
+                height: 3rem;
+            }
+
+            .logo h1 {
+                font-size: 1.5rem;
+            }
+
+            .screen-content {
+                padding: 1rem;
+            }
+
+            .role-btn {
+                padding: 1rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.75rem;
+            }
+
+            .role-content {
+                text-align: center;
+            }
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+        .loading { opacity: 0.6; pointer-events: none; }
+
+        /* Animation Classes */
+        .animate-in {
+            animation: slideInUp 0.6s ease-out forwards;
+            opacity: 0;
+            transform: translateY(1.5rem);
+        }
+
+        @keyframes slideInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Sound Button */
+        .sound-toggle {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .sound-toggle:hover {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+            transform: scale(1.05);
+        }
+
+        .sound-toggle.muted {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <!-- Initial Loader -->
+    <div id="initialLoader" class="loader-overlay">
+        <div class="loader-card">
+            <div class="loader">
+                <p>SurakshaVault</p>
+                <div class="words">
+                    <span class="word">Secure</span>
+                    <span class="word">Protected</span>
+                    <span class="word">Encrypted</span>
+                    <span class="word">Trusted</span>
+                    <span class="word">Secure</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Background Animation -->
+    <div class="background-animation">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+            <div class="shape shape-4"></div>
+            <div class="shape shape-5"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="auth-wrapper">
+            <!-- Header -->
+            <div class="header">
+                <!-- Sound Toggle -->
+                <button class="sound-toggle" id="soundToggle" title="Toggle Sound">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+                
+                <!-- Theme Toggle -->
+                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i> 
+                </button>
+                
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h1>SurakshaVault</h1>
+                </div>
+                <p class="tagline">Secure. Protected. Trusted.</p>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="content-area">
+                <!-- User Type Selection -->
+                <div id="selection" class="screen active">
+                    <div class="screen-content">
+                        <h2 class="screen-title">Access Portal</h2>
+                        <p class="screen-subtitle">Choose your access level</p>
+                        <div class="button-group">
+                            <button id="userBtn" class="role-btn" data-role="user">
+                                <div class="role-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="role-content">
+                                    <span class="role-title">Individual User</span>
+                                    <small class="role-desc">Personal Security Access</small>
+                                </div>
+                                <div class="role-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </button>
+                            <button id="partnerBtn" class="role-btn" data-role="partner">
+                                <div class="role-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="role-content">
+                                    <span class="role-title">Enterprise Partner</span>
+                                    <small class="role-desc">Business Security Solutions</small>
+                                </div>
+                                <div class="role-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </button>
+                            <!-- Admin Panel Link Button -->
+                            <a href="adminPanel.html" id="adminPanelBtn" class="role-btn" style="text-decoration:none; display:flex; align-items:center; gap:0.75rem; margin-top:1rem; background:var(--bg-tertiary); border:1px solid var(--border);">
+                                <div class="role-icon">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <div class="role-content">
+                                    <span class="role-title">Admin Panel</span>
+                                    <small class="role-desc">System Administration</small>
+                                </div>
+                                <div class="role-arrow">
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Screen -->
+                <div id="registration" class="screen">
+                    <div class="screen-content">
+                        <div class="screen-header">
+                            <button id="backToSelection" class="back-btn">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h2 id="regTitle" class="screen-title">Create Secure Account</h2>
+                        </div>
+                        <form id="regForm" class="auth-form">
+                            <!-- Dynamic fields will be inserted here -->
+                        </form>
+                        <div class="form-footer">
+                            <p>Already have an account? <button id="toLoginBtn" class="link-btn">Sign In</button></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Login Screen -->
+                <div id="login" class="screen">
+                    <div class="screen-content">
+                        <div class="screen-header">
+                            <button id="backToSelectionFromLogin" class="back-btn">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h2 class="screen-title">Secure Login</h2>
+                        </div>
+                        <form id="loginForm" class="auth-form">
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <input type="text" id="loginUsername" placeholder="Username" required>
+                            </div>
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <input type="password" id="loginPassword" placeholder="Password" required>
+                                <button type="button" class="toggle-password">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-text">
+                                    <i class="fas fa-sign-in-alt"></i>
+                                    Access Vault
+                                </span>
+                                <div class="btn-loader">
+                                    <div class="spinner"></div>
+                                </div>
+                            </button>
+                        </form>
+                        <div class="form-footer">
+                            <button id="forgotPasswordBtn" class="link-btn forgot-link">
+                                <i class="fas fa-key"></i>
+                                Forgot Password?
+                            </button>
+                            <p>Need an account? <button id="toRegisterBtn" class="link-btn">Create Account</button></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Forgot Password Screen -->
+                <div id="forgotPassword" class="screen">
+                    <div class="screen-content">
+                        <div class="screen-header">
+                            <button id="backToLogin" class="back-btn">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h2 class="screen-title">Password Recovery</h2>
+                        </div>
+                        <p class="screen-subtitle">Enter your username or email to reset your password</p>
+                        <form id="forgotPasswordForm" class="auth-form">
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <input type="text" id="recoveryIdentifier" placeholder="Username or Email" required>
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-text">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Send Recovery Link
+                                </span>
+                                <div class="btn-loader">
+                                    <div class="spinner"></div>
+                                </div>
+                            </button>
+                        </form>
+                        <div class="form-footer">
+                            <p>Remember your password? <button id="backToLoginLink" class="link-btn">Sign In</button></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Info Form -->
+                <div id="userInfoForm" class="screen">
+                    <div class="screen-content">
+                        <div class="screen-header">
+                            <button id="backToLoginFromUserInfo" class="back-btn">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <h2 class="screen-title">Complete Your Profile</h2>
+                        </div>
+                        <form id="userInfoFormFields" class="auth-form">
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+                                <input type="text" id="adhaarNumber" placeholder="Adhaar Number" required maxlength="12" oninput="this.value=this.value.replace(/\D/g,'').slice(0,12)">
+                            </div>
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <input type="text" id="panNumber" placeholder="PAN Number" required>
+                            </div>
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <input type="number" id="annualIncome" placeholder="Annual Income" required>
+                            </div>
+                                <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                                <input type="text" id="accountNumber" placeholder="Account Number" required>
+                            </div>
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <input type="text" id="cardNumber" placeholder="Card Number" required maxlength="19" oninput="this.value=this.value.replace(/\D/g,'').slice(0,19)">
+                            </div>
+                            <div class="input-group">
+                                <div class="input-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <input type="number" id="cibilScore" placeholder="CIBIL Score" required>
+                            </div>
+                            <button type="submit" class="submit-btn">
+                                <span class="btn-text">
+                                    <i class="fas fa-save"></i>
+                                    Save Profile
+                                </span>
+                                <div class="btn-loader">
+                                    <div class="spinner"></div>
+                                </div>
+                            </button>
+                        </form>
+                        <div id="userInfoMessage" class="form-footer"></div>
+                    </div>
+                </div>
+                <!-- Enterprise Info Form -->
+<div id="enterpriseInfoForm" class="screen">
+    <div class="screen-content">
+        <form id="enterpriseInfoFormFields" class="auth-form">
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-building"></i></div>
+                <input type="text" id="companyUsername" name="companyUsername" placeholder="Company Username" required>
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-id-card"></i></div>
+                <input type="text" id="companyName" name="companyName" placeholder="Company Name" required>
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-file-invoice"></i></div>
+                <input type="text" id="gstNumber" name="gstNumber" placeholder="GST Number">
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-align-left"></i></div>
+                <textarea id="description" name="description" placeholder="Description" rows="3"></textarea>
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-map-marker-alt"></i></div>
+                <textarea id="address" name="address" placeholder="Address" rows="2"></textarea>
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-envelope"></i></div>
+                <input type="email" id="contactEmail" name="contactEmail" placeholder="Contact Email">
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-phone"></i></div>
+                <input type="text" id="contactPhone" name="contactPhone" placeholder="Contact Phone">
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-globe"></i></div>
+                <input type="text" id="website" name="website" placeholder="Website">
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-industry"></i></div>
+                <input type="text" id="industry" name="industry" placeholder="Industry">
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-id-badge"></i></div>
+                <input type="text" id="cinId" name="cinId" placeholder="CIN ID">
+            </div>
+            <div class="input-group">
+                <div class="input-icon"><i class="fas fa-id-badge"></i></div>
+                <input type="text" id="dinId" name="dinId" placeholder="DIN ID">
+            </div>
+            <button type="submit" class="submit-btn">
+                <span class="btn-text"><i class="fas fa-save"></i> Update Company Info</span>
+                <div class="btn-loader"><div class="spinner"></div></div>
+            </button>
+        </form>
+        <div id="enterpriseInfoMessage" class="form-footer"></div>
+    </div>
+</div>
+
+                <!-- Token Display -->
+                <div id="token" class="screen">
+                    <div class="screen-content">
+                        <div class="success-header">
+                            <div class="success-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h2 class="screen-title">Access Granted</h2>
+                            <p class="success-message">Welcome to your secure vault</p>
+                        </div>
+                        <div class="token-container">
+                            <h3>Your Security Token</h3>
+                            <div class="token-display">
+                                <pre id="tokenValue"></pre>
+                                <button id="copyToken" class="copy-btn">
+                                    <i class="fas fa-copy"></i>
+                                    <span>Copy Token</span>
+                                </button>
+                            </div>
+                        </div>
+                        <button id="logoutBtn" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Secure Logout</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loadingOverlay" class="loading-overlay">
+            <div class="loading-content">
+                <div class="loading-spinner">
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-ring"></div>
+                </div>
+                <p class="loading-text">Securing your connection...</p>
+            </div>
+        </div>
+
+        <!-- Alert Messages -->
+        <div id="alertContainer" class="alert-container"></div>
+    </div>
+
+    <script type="module">
+    import API_BASE_URL from './api-config.js';
+    // 1-to-1 mapping from plaintext char → “random” token
+    const encMap = {
+      '0': "@!#45",  '1': "$#$234", '2': "QwEr2", '3': "ZxCv3",
+      '4': "MnBv4",  '5': "PoIj5",  '6': "LkJh6", '7': "UuYt7",
+      '8': "AaSs8",  '9': "DdFf9",
+      'a': "GhJk1",  'b': "ZxXc2",  'c': "VvBb3", 'd': "CcNn4",
+      'e': "MmQq5",  'f': "WwEe6",  'g': "RrTt7", 'h': "YyUu8",
+      'i': "IiOo9",  'j': "PpLl0",  'k': "KkJj1", 'l': "HhGg2",
+      'm': "FfDd3",  'n': "SsAa4",  'o': "ZzXx5", 'p': "CcVv6",
+      'q': "BbNn7",  'r': "MmKk8",  's': "JjHh9", 't': "GgFf0",
+      'u': "DdSs1",  'v': "AaZz2",  'w': "XxCc3", 'x': "VvBb4",
+      'y': "NnMm5",  'z': "LlKk6",
+      ' ': "SPC",  '.': "DOT",  ',': "COM", '!': "EXC"
+    };
+
+    // Build reverse-mapping from token → plaintext char
+    const decMap = {};
+    for (const [ch, tok] of Object.entries(encMap)) {
+      decMap[tok] = ch;
+    }
+
+    // Encrypts plain text by concatenating tokens
+    function encrypt(plain) {
+      let cipher = "";
+      for (const ch of plain) {
+        if (!(ch in encMap)) {
+          console.warn(`No mapping for '${ch}', skipping.`);
+          continue;
+        }
+        cipher += encMap[ch];
+      }
+      return cipher;
+    }
+
+    // Decrypts cipher text by splitting into tokens
+    function decrypt(cipher) {
+      let plain = "";
+      let i = 0;
+      const tokens = Object.values(encMap);
+      while (i < cipher.length) {
+        let found = false;
+        for (const tok of tokens) {
+          if (cipher.startsWith(tok, i)) {
+            plain += decMap[tok];
+            i += tok.length;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          // Unknown token, skip one char
+          i++;
+        }
+      }
+      return plain;
+    }
+
+    // Encrypt partner registration fields (except username, password, companyName) before submit
+    document.addEventListener('DOMContentLoaded', () => {
+      const enterpriseForm = document.getElementById('enterpriseInfoFormFields');
+      if (enterpriseForm) {
+        enterpriseForm.addEventListener('submit', (e) => {
+          // Exclude these fields from encryption
+          const exclude = ['companyUsername', 'companyName', 'password'];
+          for (const el of enterpriseForm.elements) {
+            if ((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && !exclude.includes(el.name)) {
+              if (el.value) {
+                el.value = encrypt(el.value.toLowerCase());
+              }
+            }
+          }
+        }, true); // useCapture to run before other handlers
+      }
+    });
+        // Sound Management
+        class SoundManager {
+            constructor() {
+                this.enabled = localStorage.getItem('sv_sound_enabled') !== 'false';
+                this.updateSoundButton();
+                this.initSounds();
+            }
+
+            initSounds() {
+                // Create audio context for better browser support
+                this.audioContext = null;
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Web Audio API not supported');
+                }
+            }
+
+            // Generate simple tones using Web Audio API
+            playTone(frequency, duration, type = 'sine') {
+                if (!this.enabled || !this.audioContext) return;
+
+                try {
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+                    oscillator.type = type;
+                    
+                    gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                } catch (e) {
+                    console.log('Sound playback failed:', e);
+                }
+            }
+
+            click() {
+                this.playTone(800, 0.1);
+            }
+
+            success() {
+                this.playTone(600, 0.2);
+                setTimeout(() => this.playTone(800, 0.2), 100);
+            }
+
+            error() {
+                this.playTone(300, 0.3);
+            }
+
+            notification() {
+                this.playTone(1000, 0.15);
+            }
+
+            toggle() {
+                this.enabled = !this.enabled;
+                localStorage.setItem('sv_sound_enabled', this.enabled);
+                this.updateSoundButton();
+                if (this.enabled) this.click();
+            }
+
+            updateSoundButton() {
+                const button = document.getElementById('soundToggle');
+                const icon = button.querySelector('i');
+                
+                if (this.enabled) {
+                    icon.className = 'fas fa-volume-up';
+                    button.classList.remove('muted');
+                    button.title = 'Mute Sounds';
+                } else {
+                    icon.className = 'fas fa-volume-mute';
+                    button.classList.add('muted');
+                    button.title = 'Enable Sounds';
+                }
+            }
+        }
+
+        // Theme Management
+        class ThemeManager {
+            constructor() {
+                this.theme = localStorage.getItem('sv_theme') || 'light';
+                this.init();
+            }
+
+            init() {
+                document.documentElement.setAttribute('data-theme', this.theme);
+                this.updateThemeButton();
+            }
+
+            toggle() {
+                this.theme = this.theme === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', this.theme);
+                localStorage.setItem('sv_theme', this.theme);
+                this.updateThemeButton();
+            }
+
+            updateThemeButton() {
+                const button = document.getElementById('themeToggle');
+                const icon = button.querySelector('i');
+                
+                if (this.theme === 'dark') {
+                    icon.className = 'fas fa-sun';
+                    button.title = 'Switch to Light Mode';
+                } else {
+                    icon.className = 'fas fa-moon';
+                    button.title = 'Switch to Dark Mode';
+                }
+            }
+        }
+
+        // Main Authentication Class - KEEPING ALL YOUR ORIGINAL BACKEND LOGIC
+        class SurakshaVaultAuth {
+            constructor() {
+                this.baseUrl = API_BASE_URL + '/auth';
+                this.userType = "";
+                this.currentScreen = "selection";
+                this.jwtToken = "";
+                this.currentUsername = "";
+                
+                // Initialize sound and theme managers
+                this.soundManager = new SoundManager();
+                this.themeManager = new ThemeManager();
+                
+                // Show loader then initialize
+                setTimeout(() => {
+                    const loader = document.getElementById('initialLoader');
+                    if (loader) {
+                        loader.style.opacity = '0';
+                        setTimeout(() => {
+                            loader.remove();
+                            this.init();
+                        }, 500);
+                    }
+                }, 3000);
+            }
+
+            init() {
+                // Check for existing auth in localStorage - YOUR ORIGINAL LOGIC
+                const savedToken = localStorage.getItem('sv_token');
+                const savedUsername = localStorage.getItem('sv_username');
+                
+                //if (savedToken && savedUsername) {
+                    // Redirect to dashboard instead of showing token screen
+                    //window.location.href = 'dashboard.html';
+                   // return;
+                //}
+                
+                this.bindEvents();
+                this.showScreen("selection");
+                this.initializeAnimations();
+            }
+
+            initializeAnimations() {
+                const roleButtons = document.querySelectorAll(".role-btn");
+                roleButtons.forEach((btn, index) => {
+                    btn.style.animationDelay = `${index * 0.1}s`;
+                    btn.classList.add("animate-in");
+                });
+            }
+
+            bindEvents() {
+                // Sound and theme toggles
+                document.getElementById('soundToggle').addEventListener('click', () => {
+                    this.soundManager.toggle();
+                });
+                
+                document.getElementById('themeToggle').addEventListener('click', () => {
+                    this.themeManager.toggle();
+                    this.soundManager.click();
+                });
+
+                // Navigation events - YOUR ORIGINAL LOGIC
+                document.getElementById("userBtn").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.initRegistration("user");
+                });
+                document.getElementById("partnerBtn").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.initRegistration("partner");
+                });
+                document.getElementById("backToSelection").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.showScreen("selection");
+                });
+                document.getElementById("backToSelectionFromLogin").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.showScreen("selection");
+                });
+                document.getElementById("toLoginBtn").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.showScreen("login");
+                });
+                document.getElementById("toRegisterBtn").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.initRegistration(this.userType || "user");
+                });
+                document.getElementById("backToLogin").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.showScreen("login");
+                });
+                document.getElementById("backToLoginLink").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.showScreen("login");
+                });
+                document.getElementById("forgotPasswordBtn").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.showScreen("forgotPassword");
+                });
+                document.getElementById("logoutBtn").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.logout();
+                });
+                
+                // User info form events - YOUR ORIGINAL LOGIC
+                document.getElementById("userInfoFormFields").addEventListener("submit", (e) => this.handleUserInfo(e));
+                document.getElementById("backToLoginFromUserInfo").addEventListener("click", () => {
+                    this.soundManager.click();
+                    this.showScreen("login");
+                });
+
+                // Form events - YOUR ORIGINAL LOGIC
+                document.getElementById("regForm").addEventListener("submit", (e) => this.handleRegistration(e));
+                document.getElementById("loginForm").addEventListener("submit", (e) => this.handleLogin(e));
+                document.getElementById("forgotPasswordForm").addEventListener("submit", (e) => this.handleForgotPassword(e));
+
+                // Token copy event - YOUR ORIGINAL LOGIC
+                document.getElementById("copyToken").addEventListener("click", () => this.copyToken());
+
+                // Password toggle events - YOUR ORIGINAL LOGIC
+                document.addEventListener("click", (e) => {
+                    if (e.target.closest(".toggle-password")) {
+                        this.soundManager.click();
+                        this.togglePassword(e.target.closest(".toggle-password"));
+                    }
+                });
+
+                // Add input focus animations - YOUR ORIGINAL LOGIC
+                document.addEventListener("focusin", (e) => {
+                    if (e.target.matches("input")) {
+                        this.animateInputFocus(e.target, true);
+                    }
+                });
+
+                document.addEventListener("focusout", (e) => {
+                    if (e.target.matches("input")) {
+                        this.animateInputFocus(e.target, false);
+                    }
+                });
+
+                // Bind enterprise info form submit event
+                if (document.getElementById("enterpriseInfoFormFields")) {
+                    document.getElementById("enterpriseInfoFormFields").addEventListener("submit", (e) => this.handleEnterpriseInfo(e));
+                }
+            }
+
+            // ALL YOUR ORIGINAL METHODS PRESERVED EXACTLY AS THEY WERE
+            animateInputFocus(input, isFocused) {
+                const inputGroup = input.closest(".input-group");
+                if (inputGroup) {
+                    if (isFocused) {
+                        inputGroup.style.transform = "scale(1.02)";
+                    } else {
+                        inputGroup.style.transform = "scale(1)";
+                    }
+                }
+            }
+
+            showScreen(screenName) {
+                const currentScreen = document.querySelector(".screen.active");
+                const newScreen = document.getElementById(screenName);
+
+                if (currentScreen) {
+                    currentScreen.style.transform = "translateX(-30px)";
+                    currentScreen.style.opacity = "0";
+
+                    setTimeout(() => {
+                        currentScreen.classList.remove("active");
+                        newScreen.classList.add("active");
+                        newScreen.style.transform = "translateX(30px)";
+                        newScreen.style.opacity = "0";
+
+                        setTimeout(() => {
+                            newScreen.style.transform = "translateX(0)";
+                            newScreen.style.opacity = "1";
+                        }, 50);
+                    }, 200);
+                } else {
+                    newScreen.classList.add("active");
+                }
+
+                this.currentScreen = screenName;
+            }
+
+            showLoading(show = true) {
+                const overlay = document.getElementById("loadingOverlay");
+                const submitBtns = document.querySelectorAll(".submit-btn");
+
+                if (show) {
+                    overlay.classList.add("active");
+                    submitBtns.forEach((btn) => btn.classList.add("loading"));
+                } else {
+                    overlay.classList.remove("active");
+                    submitBtns.forEach((btn) => btn.classList.remove("loading"));
+                }
+            }
+
+            showAlert(message, type = "error") {
+                const container = document.getElementById("alertContainer");
+                const alert = document.createElement("div");
+                alert.className = `alert ${type}`;
+
+                const iconMap = {
+                    success: "check-circle",
+                    info: "info-circle",
+                    error: "exclamation-triangle",
+                    warning: "exclamation-triangle",
+                };
+
+                const icon = iconMap[type] || iconMap.error;
+
+                alert.innerHTML = `
+                    <i class="fas fa-${icon}"></i>
+                    <span>${message}</span>
+                `;
+
+                container.appendChild(alert);
+
+                // Play sound based on alert type
+                if (type === 'success') {
+                    this.soundManager.success();
+                } else if (type === 'error') {
+                    this.soundManager.error();
+                } else {
+                    this.soundManager.notification();
+                }
+
+                // Add entrance animation
+                setTimeout(() => {
+                    alert.style.transform = "translateX(0)";
+                }, 10);
+
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    alert.style.transform = "translateX(100%)";
+                    alert.style.opacity = "0";
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.remove();
+                        }
+                    }, 300);
+                }, 5000);
+            }
+
+            initRegistration(type) {
+                this.userType = type;
+                this.showScreen("registration");
+
+                const regForm = document.getElementById("regForm");
+                const regTitle = document.getElementById("regTitle");
+
+                regForm.innerHTML = "";
+
+                if (type === "user") {
+                    regTitle.textContent = "Create User Account";
+                    this.addField("username", "text", "Username", "user");
+                    this.addField("fullName", "text", "Full Name", "id-card");
+                    this.addField("phoneNumber", "tel", "Phone Number", "phone");
+                    this.addField("email", "email", "Email Address", "envelope");
+                    this.addField("password", "password", "Password", "lock");
+                    this.addField("confirmPassword", "password", "Confirm Password", "lock");
+                    this.addField("age", "number", "Age", "calendar");
+                } else {
+                    regTitle.textContent = "Create Partner Account";
+                    this.addField("username", "text", "Company Username", "building");
+                    this.addField("email", "email", "Business Email", "envelope");
+                    this.addField("companyAge", "number", "Company Age (Years)", "calendar");
+                    this.addField("password", "password", "Password", "lock");
+                    this.addField("confirmPassword", "password", "Confirm Password", "lock");
+                }
+
+                const submitBtn = document.createElement("button");
+                submitBtn.innerHTML = `
+                    <span class="btn-text">
+                        <i class="fas fa-user-plus"></i> 
+                        Create Secure Account
+                    </span>
+                    <div class="btn-loader">
+                        <div class="spinner"></div>
+                    </div>
+                `;
+                submitBtn.type = "submit";
+                submitBtn.className = "submit-btn";
+                regForm.appendChild(submitBtn);
+
+                // Add stagger animation to form fields
+                const inputGroups = regForm.querySelectorAll(".input-group");
+                inputGroups.forEach((group, index) => {
+                    group.style.opacity = "0";
+                    group.style.transform = "translateY(20px)";
+                    setTimeout(() => {
+                        group.style.transition = "all 0.4s ease";
+                        group.style.opacity = "1";
+                        group.style.transform = "translateY(0)";
+                    }, index * 100);
+                });
+            }
+
+            addField(name, type, placeholder, icon) {
+                const inputGroup = document.createElement("div");
+                inputGroup.className = "input-group";
+
+                const iconElement = document.createElement("div");
+                iconElement.className = "input-icon";
+                iconElement.innerHTML = `<i class="fas fa-${icon}"></i>`;
+
+                const input = document.createElement("input");
+                input.type = type;
+                input.id = name;
+                input.name = name;
+                input.placeholder = placeholder;
+                input.required = true;
+
+                inputGroup.appendChild(iconElement);
+                inputGroup.appendChild(input);
+
+                if (type === "password") {
+                    const toggleBtn = document.createElement("button");
+                    toggleBtn.type = "button";
+                    toggleBtn.className = "toggle-password";
+                    toggleBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                    inputGroup.appendChild(toggleBtn);
+
+                    if (name === "password") {
+                        input.addEventListener("input", () => this.checkPasswordStrength(input.value));
+                    }
+                }
+
+                document.getElementById("regForm").appendChild(inputGroup);
+
+                if (name === "password") {
+                    const strengthIndicator = document.createElement("div");
+                    strengthIndicator.className = "password-strength";
+                    strengthIndicator.innerHTML = `
+                        <div class="strength-text">Password Strength: <span id="strengthText">Enter password</span></div>
+                        <div class="strength-bar">
+                            <div id="strengthFill" class="strength-fill"></div>
+                        </div>
+                    `;
+                    document.getElementById("regForm").appendChild(strengthIndicator);
+                }
+            }
+
+            checkPasswordStrength(password) {
+                const strengthText = document.getElementById("strengthText");
+                const strengthFill = document.getElementById("strengthFill");
+
+                if (!strengthText || !strengthFill) return;
+
+                let strength = 0;
+                let text = "Weak";
+                let className = "strength-weak";
+
+                if (password.length >= 8) strength++;
+                if (/[a-z]/.test(password)) strength++;
+                if (/[A-Z]/.test(password)) strength++;
+                if (/[0-9]/.test(password)) strength++;
+                if (/[^A-Za-z0-9                if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+                const strengthLevels = [
+                    { text: "Very Weak", className: "strength-weak" },
+                    { text: "Weak", className: "strength-weak" },
+                    { text: "Fair", className: "strength-fair" },
+                    { text: "Good", className: "strength-good" },
+                    { text: "Strong", className: "strength-strong" },
+                ];
+
+                const level = strengthLevels[Math.min(strength, 4)];
+                text = level.text;
+                className = level.className;
+
+                strengthText.textContent = text;
+                strengthFill.className = `strength-fill ${className}`;
+            }
+
+            togglePassword(button) {
+                const input = button.parentElement.querySelector("input");
+                const icon = button.querySelector("i");
+
+                if (input.type === "password") {
+                    input.type = "text";
+                    icon.className = "fas fa-eye-slash";
+                } else {
+                    input.type = "password";
+                    icon.className = "fas fa-eye";
+                }
+
+                // Add toggle animation
+                button.style.transform = "scale(0.9)";
+                setTimeout(() => {
+                    button.style.transform = "scale(1)";
+                }, 150);
+            }
+
+            validateForm(formData, isRegistration = false) {
+                if (isRegistration) {
+                    if (formData.password !== formData.confirmPassword) {
+                        this.showAlert("Passwords do not match!");
+                        return false;
+                    }
+
+                    if (formData.password.length < 8) {
+                        this.showAlert("Password must be at least 8 characters long!");
+                        return false;
+                    }
+
+                    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+                        this.showAlert("Please enter a valid email address!");
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            async handleRegistration(e) {
+                e.preventDefault();
+
+                const formData = new FormData(e.target);
+                const data = {};
+
+                formData.forEach((value, key) => {
+                    if (key === "age" || key === "companyAge") {
+                        data[key] = Number(value);
+                    } else if (key !== "confirmPassword") {
+                        data[key] = value;
+                    }
+                });
+
+                data.confirmPassword = formData.get("confirmPassword");
+
+                if (!this.validateForm(data, true)) return;
+
+                delete data.confirmPassword;
+
+                const endpoint = this.userType === "user" ? "/userRegistration" : "/PartnerRegistration";
+
+                this.showLoading(true);
+
+                try {
+                    const response = await fetch(this.baseUrl + endpoint, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error("Registration failed. Please try again.");
+                    }
+
+                    // Automatically log in after successful registration
+                    const loginData = {
+                        username: data.username,
+                        password: data.password
+                    };
+
+                    const loginResponse = await fetch(`${this.baseUrl}/login`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(loginData),
+                    });
+
+                    if (!loginResponse.ok) {
+                        throw new Error("Automatic login failed after registration");
+                    }
+
+                    const token = await loginResponse.text();
+                    this.jwtToken = token;
+                    this.currentUsername = data.username;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('sv_token', token);
+                    localStorage.setItem('sv_username', data.username);
+
+                    // Show profile completion screen for users, show enterprise info for partners
+                    if (this.userType === "user") {
+                        this.showScreen("userInfoForm");
+                        this.showAlert("Account created! Please complete your profile.", "success");
+                    } else {
+                        this.showScreen("enterpriseInfoForm");
+                        this.showAlert("Partner account created! Please complete your company info.", "success");
+                    }
+                } catch (error) {
+                    this.showAlert(error.message);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async handleLogin(e) {
+                e.preventDefault();
+
+                const username = document.getElementById("loginUsername").value;
+                const password = document.getElementById("loginPassword").value;
+
+                this.showLoading(true);
+
+                try {
+                    // Login request
+                    const loginResponse = await fetch(`${this.baseUrl}/login`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username, password }),
+                    });
+
+                    if (!loginResponse.ok) {
+                        throw new Error("Invalid credentials. Please check your username and password.");
+                    }
+
+                    const token = await loginResponse.text();
+                    this.jwtToken = token;
+                    this.currentUsername = username;
+
+                    // Save to localStorage
+                    localStorage.setItem('sv_token', token);
+                    localStorage.setItem('sv_username', username);
+
+                    // Redirect based on userType
+                    if (this.userType === 'user') {
+                        // User login flow
+                        const profileResponse = await fetch(`${API_BASE_URL}/userinfo/${username}`, {
+                            method: "GET",
+                            headers: {
+                                "Authorization": `Bearer ${token}`
+                            }
+                        });
+
+                        if (profileResponse.ok) {
+                            // Profile exists - redirect to dashboard
+                            this.showAlert("Login successful! Welcome back.", "success");
+                            setTimeout(() => {
+                                window.location.href = 'dashboard.html';
+                            }, 1500);
+                        } else {
+                            // Profile doesn't exist - show user info form
+                            this.showScreen("userInfoForm");
+                            this.showAlert("Login successful! Please complete your profile.", "success");
+                        }
+                    } else {
+                        // Partner (enterprise) login flow
+                        this.showAlert("Login successful! Redirecting to company profile...", "success");
+                        setTimeout(() => {
+                            window.location.href = 'companyprofile.html';
+                        }, 1500);
+                    }
+                } catch (error) {
+                    this.showAlert(error.message);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async handleUserInfo(e) {
+                e.preventDefault();
+                const adhaarNumber = document.getElementById("adhaarNumber").value;
+                const panNumber = document.getElementById("panNumber").value;
+                const annualIncome = document.getElementById("annualIncome").value;
+                const accountNumber = document.getElementById("accountNumber").value;
+                const cardNumber = document.getElementById("cardNumber").value;
+                const cibilScore = document.getElementById("cibilScore").value;
+
+                // Validation with toast alerts
+                if (!adhaarNumber || !panNumber || !annualIncome || !accountNumber || !cardNumber || !cibilScore) {
+                    this.showAlert("Please fill in all profile fields.", "warning");
+                    return;
+                }
+                if (!/^\d{12}$/.test(adhaarNumber)) {
+                    this.showAlert("Aadhaar number must be exactly 12 digits.", "warning");
+                    return;
+                }
+                if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/i.test(panNumber)) {
+                    this.showAlert("PAN number must be 10 characters (e.g., ABCDE1234F).", "warning");
+                    return;
+                }
+                if (!/^\d{9,18}$/.test(accountNumber)) {
+                    this.showAlert("Account number must be 9 to 18 digits.", "warning");
+                    return;
+                }
+                if (!/^\d{12,19}$/.test(cardNumber)) {
+                    this.showAlert("Card number must be 12 to 19 digits.", "warning");
+                    return;
+                }
+                if (!/^\d+$/.test(annualIncome) || Number(annualIncome) <= 0) {
+                    this.showAlert("Annual income must be a positive number.", "warning");
+                    return;
+                }
+                if (!/^\d{3}$/.test(cibilScore) || Number(cibilScore) < 300 || Number(cibilScore) > 900) {
+                    this.showAlert("CIBIL score must be a 3-digit number between 300 and 900.", "warning");
+                    return;
+                }
+
+                const data = {
+                    username: this.currentUsername,
+                    adhaarNumber,
+                    panNumber,
+                    annualIncome: annualIncome,
+                    accountNumber,
+                    cardNumber,
+                    cibilScore: Number(cibilScore),
+                    transactions: []
+                };
+
+                this.showLoading(true);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/userinfo/${this.currentUsername}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${this.jwtToken}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) {
+                        throw new Error("Failed to save profile");
+                    }
+                    this.showAlert("Profile saved successfully!", "success");
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } catch (error) {
+                    this.showAlert(error.message);
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async handleEnterpriseInfo(e) {
+                e.preventDefault();
+                const companyName = document.getElementById('companyName').value;
+                const gstNumber = document.getElementById('gstNumber').value;
+                const description = document.getElementById('description').value;
+                const address = document.getElementById('address').value;
+                const contactEmail = document.getElementById('contactEmail').value;
+                const contactPhone = document.getElementById('contactPhone').value;
+                const website = document.getElementById('website').value;
+                const industry = document.getElementById('industry').value;
+                const cinId = document.getElementById('cinId').value;
+                const dinId = document.getElementById('dinId').value;
+
+                if (!companyName || !contactEmail || !address) {
+                    this.showAlert('Please fill in all required fields.', 'warning');
+                    return;
+                }
+
+                const data = {
+                    companyName,
+                    gstNumber,
+                    description,
+                    address,
+                    contactEmail,
+                    contactPhone,
+                    website,
+                    industry,
+                    cinId,
+                    dinId
+                };
+
+                this.showLoading(true);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/company`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.jwtToken}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(errorText || 'Failed to update company info');
+                    }
+                    const json = await response.json();
+                    this.showAlert('Company info updated successfully!', 'success');
+                    document.getElementById('enterpriseInfoMessage').textContent = 'Update successful.';
+                    setTimeout(() => {
+                        window.location.href = 'companyprofile.html';
+                    }, 1500);
+                } catch (error) {
+                    this.showAlert(error.message);
+                    document.getElementById('enterpriseInfoMessage').textContent = error.message;
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            async handleForgotPassword(e) {
+                e.preventDefault();
+
+                const identifier = document.getElementById("recoveryIdentifier").value;
+
+                this.showLoading(true);
+
+                try {
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                    this.showAlert("Password recovery link sent to your email!", "success");
+                    setTimeout(() => this.showScreen("login"), 3000);
+                } catch (error) {
+                    this.showAlert("Failed to send recovery email. Please try again.");
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+
+            copyToken() {
+                const tokenValue = document.getElementById("tokenValue").textContent;
+                const copyBtn = document.getElementById("copyToken");
+
+                navigator.clipboard
+                    .writeText(tokenValue)
+                    .then(() => {
+                        this.showAlert("Token copied to clipboard!", "success");
+
+                        // Visual feedback
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i><span>Copied!</span>';
+                        copyBtn.style.background = "rgba(16, 185, 129, 0.2)";
+                        copyBtn.style.borderColor = "var(--success)";
+                        copyBtn.style.color = "var(--success)";
+
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                            copyBtn.style.background = "rgba(99, 102, 241, 0.1)";
+                            copyBtn.style.borderColor = "var(--primary)";
+                            copyBtn.style.color = "var(--primary)";
+                        }, 2000);
+                    })
+                    .catch(() => {
+                        this.showAlert("Failed to copy token. Please copy manually.");
+                    });
+            }
+
+            logout() {
+                // Clear localStorage - YOUR ORIGINAL LOGIC
+                localStorage.removeItem('sv_token');
+                localStorage.removeItem('sv_username');
+                
+                // Clear session data
+                this.jwtToken = "";
+                this.currentUsername = "";
+                
+                this.showAlert("Logged out successfully!", "info");
+
+                // Add logout animation
+                const tokenScreen = document.getElementById("token");
+                tokenScreen.style.transform = "scale(0.95)";
+                tokenScreen.style.opacity = "0.5";
+
+                setTimeout(() => {
+                    this.showScreen("selection");
+                    document.getElementById("loginForm").reset();
+                    document.getElementById("tokenValue").textContent = "";
+
+                    // Reset token screen styles
+                    tokenScreen.style.transform = "scale(1)";
+                    tokenScreen.style.opacity = "1";
+                }, 1000);
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener("DOMContentLoaded", () => {
+            new SurakshaVaultAuth();
+        });
+        
+    </script>
+</body>
+</html>

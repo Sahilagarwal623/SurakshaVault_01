@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | SurakshaVault</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light Mode Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-inverse: #ffffff;
+
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-overlay: rgba(0, 0, 0, 0.5);
+
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --border-focus: #6366f1;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+
+            --navbar-height: 4rem;
+            --sidebar-width: 16rem;
+        }
+
+        /* Dark Mode Colors */
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --primary-light: #c7d2fe;
+            --secondary: #34d399;
+            --accent: #fbbf24;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --success: #34d399;
+            --info: #60a5fa;
+
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --text-inverse: #111827;
+
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            --bg-overlay: rgba(0, 0, 0, 0.8);
+
+            --border: #334155;
+            --border-light: #475569;
+            --border-focus: #818cf8;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Enhanced Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--navbar-height);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sidebar-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .brand-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .navbar-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Enhanced Sidebar */
+        .sidebar {
+            position: fixed;
+            top: var(--navbar-height);
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--navbar-height));
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-content {
+            padding: 1.5rem;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            padding: 0 0.75rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .sidebar-nav-link:hover,
+        .sidebar-nav-link.active {
+            background: var(--bg-tertiary);
+            color: var(--primary);
+        }
+
+        .sidebar-nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 1.5rem;
+            background: var(--primary);
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+
+        .sidebar-nav-icon {
+            width: 1.25rem;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 0;
+            margin-top: var(--navbar-height);
+            padding: 2rem;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        .main-content.sidebar-open {
+            margin-left: var(--sidebar-width);
+        }
+
+        /* Login Section */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - var(--navbar-height));
+            padding: 2rem;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-2xl);
+            padding: 3rem;
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 400px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .login-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            background: var(--bg-card);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--border-focus);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border-focus);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .stat-card-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .stat-card-icon.success {
+            background: linear-gradient(135deg, var(--success), #059669);
+        }
+
+        .stat-card-icon.danger {
+            background: linear-gradient(135deg, var(--danger), #dc2626);
+        }
+
+        .stat-card-icon.info {
+            background: linear-gradient(135deg, var(--info), #2563eb);
+        }
+
+        .stat-card-icon.warning {
+            background: linear-gradient(135deg, var(--warning), #d97706);
+        }
+
+        .stat-card-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .stat-card-change.positive {
+            color: var(--success);
+        }
+
+        .stat-card-change.negative {
+            color: var(--danger);
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .content-card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .content-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content-card-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .content-card-body {
+            padding: 1.5rem;
+        }
+
+        /* Enhanced Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .table th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .status-badge.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .status-badge.info {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        /* Partner Cards */
+        .partner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .partner-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .partner-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .partner-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .partner-avatar {
+            width: 3rem;
+            height: 3rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .partner-info h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .partner-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .partner-details {
+            margin-bottom: 1.5rem;
+        }
+
+        .partner-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .partner-detail:last-child {
+            border-bottom: none;
+        }
+
+        .partner-detail-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .partner-detail-value {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .partner-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 5rem;
+            right: 2rem;
+            min-width: 300px;
+            max-width: 500px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            padding: 1rem 1.5rem;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            color: white;
+        }
+
+        .toast-icon.success {
+            background: var(--success);
+        }
+
+        .toast-icon.danger {
+            background: var(--danger);
+        }
+
+        .toast-icon.warning {
+            background: var(--warning);
+        }
+
+        .toast-icon.info {
+            background: var(--info);
+        }
+
+        .toast-message {
+            flex: 1;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0;
+            width: 1.5rem;
+            height: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toast-close:hover {
+            color: var(--text-primary);
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-overlay);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .main-content.sidebar-open {
+                margin-left: 0;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-width: var(--sidebar-width);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-container {
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .partner-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .login-card {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar-container {
+                padding: 0 0.75rem;
+            }
+
+            .main-content {
+                padding: 0.75rem;
+            }
+
+            .login-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Fade-in Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(1rem);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Partner Details Modal */
+        .partner-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 2500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .partner-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-overlay);
+            backdrop-filter: blur(4px);
+        }
+
+        .partner-modal-content {
+            position: relative;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-xl);
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .partner-modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .partner-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .partner-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.5rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .partner-modal-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .partner-modal-body {
+            padding: 2rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .partner-detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .partner-detail-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .partner-detail-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .partner-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .partner-detail-item {
+            background: var(--bg-tertiary);
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+        }
+
+        .partner-detail-item-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .partner-detail-item-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .partner-history-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .partner-history-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.75rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .partner-history-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+            background: var(--bg-secondary);
+            padding: 1rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-light);
+        }
+
+        .partner-history-item::before {
+            content: '';
+            position: absolute;
+            left: -1.75rem;
+            top: 1rem;
+            width: 0.75rem;
+            height: 0.75rem;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 2px solid var(--bg-card);
+        }
+
+        .partner-history-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .partner-history-item-action {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .partner-history-item-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .partner-history-item-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .partner-actions-modal {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .partner-modal {
+                padding: 1rem;
+            }
+
+            .partner-modal-content {
+                max-height: 90vh;
+            }
+
+            .partner-modal-header,
+            .partner-modal-body {
+                padding: 1.5rem;
+            }
+
+            .partner-detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Enhanced Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <a href="#" class="brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <span class="brand-text">SurakshaVault</span>
+                    <span class="admin-badge">ADMIN</span>
+                </a>
+            </div>
+
+            <div class="navbar-right">
+                <button class="navbar-btn" id="themeToggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+
+                <div class="user-avatar" id="userAvatar" title="Admin Menu">
+                    A
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Enhanced Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Admin Panel</h3>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link active" data-section="overview">
+                            <i class="fas fa-tachometer-alt sidebar-nav-icon"></i>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link" data-section="partners">
+                            <i class="fas fa-building sidebar-nav-icon"></i>
+                            <span>Partner Verification</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link" data-section="users">
+                            <i class="fas fa-users sidebar-nav-icon"></i>
+                            <span>User Management</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link" data-section="consents">
+                            <i class="fas fa-handshake sidebar-nav-icon"></i>
+                            <span>Consent Monitoring</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">System</h3>
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link" data-section="analytics">
+                            <i class="fas fa-chart-bar sidebar-nav-icon"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link" data-section="settings">
+                            <i class="fas fa-cog sidebar-nav-icon"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link" data-section="logs">
+                            <i class="fas fa-file-alt sidebar-nav-icon"></i>
+                            <span>System Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <div class="toast-content">
+            <div class="toast-icon success" id="toastIcon">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="toast-message" id="toastMessage">
+                Operation completed successfully!
+            </div>
+            <button class="toast-close" id="toastClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Partner Details Modal -->
+    <div class="partner-modal" id="partnerModal" style="display: none;">
+        <div class="partner-modal-overlay" id="partnerModalOverlay"></div>
+        <div class="partner-modal-content">
+            <div class="partner-modal-header">
+                <h2 class="partner-modal-title" id="partnerModalTitle">Partner Details</h2>
+                <button class="partner-modal-close" id="partnerModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="partner-modal-body" id="partnerModalBody">
+                <!-- Partner details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Section -->
+    <div class="login-container" id="loginSection">
+        <div class="login-card fade-in">
+            <div class="login-header">
+                <h1 class="login-title">Admin Login</h1>
+                <p class="login-subtitle">Access the SurakshaVault Admin Panel</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="adminEmail">Email Address</label>
+                    <input type="text" id="adminEmail" class="form-input" placeholder="admin@surakshavault.com"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" class="form-input" placeholder="Enter your password"
+                        required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login to Admin Panel
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent" style="display: none;">
+        <!-- Overview Section -->
+        <div class="dashboard-section" id="overviewSection">
+            <div class="dashboard-grid">
+                <!-- Stats Cards -->
+                <div class="stats-grid fade-in">
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-title">Pending Verifications</div>
+                                <div class="stat-card-value" id="pendingVerifications">0</div>
+                                <div class="stat-card-change negative">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Requires attention</span>
+                                </div>
+                            </div>
+                            <div class="stat-card-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-title">Verified Partners</div>
+                                <div class="stat-card-value" id="verifiedPartners">0</div>
+                                <div class="stat-card-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+15% this month</span>
+                                </div>
+                            </div>
+                            <div class="stat-card-icon success">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-title">Total Users</div>
+                                <div class="stat-card-value" id="totalUsers">0</div>
+                                <div class="stat-card-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+8% this month</span>
+                                </div>
+                            </div>
+                            <div class="stat-card-icon info">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-card-header">
+                            <div>
+                                <div class="stat-card-title">Active Consents</div>
+                                <div class="stat-card-value" id="activeConsents">0</div>
+                                <div class="stat-card-change positive">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>+22% this month</span>
+                                </div>
+                            </div>
+                            <div class="stat-card-icon success">
+                                <i class="fas fa-handshake"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="content-card fade-in">
+                    <div class="content-card-header">
+                        <h2 class="content-card-title">
+                            <div class="content-card-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            Recent Admin Activity
+                        </h2>
+                    </div>
+                    <div class="content-card-body">
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Action</th>
+                                        <th>Target</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="activityTable">
+                                    <!-- Activity rows will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Partner Verification Section -->
+        <div class="dashboard-section" id="partnersSection" style="display: none;">
+            <div class="dashboard-grid">
+                <div class="content-card fade-in">
+                    <div class="content-card-header">
+                        <h2 class="content-card-title">
+                            <div class="content-card-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            Partner Verification Queue
+                        </h2>
+                        <button class="btn btn-secondary" id="refreshPartners">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="content-card-body">
+                        <div class="partner-grid" id="partnerGrid">
+                            <!-- Partner cards will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other sections would be implemented similarly -->
+        <div class="dashboard-section" id="usersSection" style="display: none;">
+            <div class="content-card fade-in">
+                <div class="content-card-header">
+                    <h2 class="content-card-title">
+                        <div class="content-card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        User Management
+                    </h2>
+                </div>
+                <div class="content-card-body">
+                    <p>User management features coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section" id="consentsSection" style="display: none;">
+            <div class="content-card fade-in">
+                <div class="content-card-header">
+                    <h2 class="content-card-title">
+                        <div class="content-card-icon">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        Consent Monitoring
+                    </h2>
+                </div>
+                <div class="content-card-body">
+                    <p>Consent monitoring dashboard coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section" id="analyticsSection" style="display: none;">
+            <div class="content-card fade-in">
+                <div class="content-card-header">
+                    <h2 class="content-card-title">
+                        <div class="content-card-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        System Analytics
+                    </h2>
+                </div>
+                <div class="content-card-body">
+                    <p>Analytics dashboard coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section" id="settingsSection" style="display: none;">
+            <div class="content-card fade-in">
+                <div class="content-card-header">
+                    <h2 class="content-card-title">
+                        <div class="content-card-icon">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        System Settings
+                    </h2>
+                </div>
+                <div class="content-card-body">
+                    <p>System settings panel coming soon...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-section" id="logsSection" style="display: none;">
+            <div class="content-card fade-in">
+                <div class="content-card-header">
+                    <h2 class="content-card-title">
+                        <div class="content-card-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        System Logs
+                    </h2>
+                </div>
+                <div class="content-card-body">
+                    <p>System logs viewer coming soon...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Application State
+        const app = {
+            theme: localStorage.getItem('sv_admin_theme') || 'light',
+            sidebarOpen: false,
+            isLoggedIn: false,
+            adminToken: '',
+            currentSection: 'overview',
+            data: {
+                pendingVerifications: 0,
+                verifiedPartners: 0,
+                totalUsers: 0,
+                activeConsents: 0,
+                partners: [],
+                recentActivity: [
+                    {
+                        timestamp: '2024-07-17 14:30',
+                        action: 'Partner Verified',
+                        target: 'HealthTech Solutions',
+                        status: 'success'
+                    },
+                    {
+                        timestamp: '2024-07-17 12:15',
+                        action: 'User Account Suspended',
+                        target: 'user@example.com',
+                        status: 'warning'
+                    },
+                    {
+                        timestamp: '2024-07-17 09:45',
+                        action: 'System Backup',
+                        target: 'Database',
+                        status: 'success'
+                    }
+                ]
+            }
+        };
+
+        // API Configuration
+        const API_BASE = 'http://192.168.230.123:8080/auth';
+
+        // DOM Elements
+        const elements = {
+            themeToggle: document.getElementById('themeToggle'),
+            sidebarToggle: document.getElementById('sidebarToggle'),
+            sidebar: document.getElementById('sidebar'),
+            overlay: document.getElementById('overlay'),
+            mainContent: document.getElementById('mainContent'),
+            loginSection: document.getElementById('loginSection'),
+            loginForm: document.getElementById('loginForm'),
+            loginBtn: document.getElementById('loginBtn'),
+            toast: document.getElementById('toast'),
+            toastIcon: document.getElementById('toastIcon'),
+            toastMessage: document.getElementById('toastMessage'),
+            toastClose: document.getElementById('toastClose'),
+            userAvatar: document.getElementById('userAvatar'),
+            pendingVerifications: document.getElementById('pendingVerifications'),
+            verifiedPartners: document.getElementById('verifiedPartners'),
+            totalUsers: document.getElementById('totalUsers'),
+            activeConsents: document.getElementById('activeConsents'),
+            activityTable: document.getElementById('activityTable'),
+            partnerGrid: document.getElementById('partnerGrid'),
+            refreshPartners: document.getElementById('refreshPartners'),
+            logoutBtn: null // will be set after button is created
+        };
+
+        // Theme Management
+        function initTheme() {
+            document.documentElement.setAttribute('data-theme', app.theme);
+            updateThemeIcon();
+        }
+
+        function toggleTheme() {
+            app.theme = app.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', app.theme);
+            localStorage.setItem('sv_admin_theme', app.theme);
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = elements.themeToggle.querySelector('i');
+            icon.className = app.theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            elements.themeToggle.title = app.theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+        }
+
+        // Sidebar Management
+        function toggleSidebar() {
+            app.sidebarOpen = !app.sidebarOpen;
+            elements.sidebar.classList.toggle('open', app.sidebarOpen);
+            elements.overlay.classList.toggle('active', app.sidebarOpen);
+            elements.mainContent.classList.toggle('sidebar-open', app.sidebarOpen);
+        }
+
+        function closeSidebar() {
+            app.sidebarOpen = false;
+            elements.sidebar.classList.remove('open');
+            elements.overlay.classList.remove('active');
+            elements.mainContent.classList.remove('sidebar-open');
+        }
+
+        // Toast Notifications
+        function showToast(message, type = 'success', duration = 3000) {
+            const iconMap = {
+                success: 'fas fa-check',
+                danger: 'fas fa-times',
+                warning: 'fas fa-exclamation-triangle',
+                info: 'fas fa-info-circle'
+            };
+
+            elements.toastIcon.className = `toast-icon ${type}`;
+            elements.toastIcon.querySelector('i').className = iconMap[type];
+            elements.toastMessage.textContent = message;
+            elements.toast.classList.add('show');
+
+            setTimeout(() => {
+                elements.toast.classList.remove('show');
+            }, duration);
+        }
+
+        // Authentication
+        async function adminLogin(email, password) {
+            try {
+                elements.loginBtn.innerHTML = '<span class="loading"></span> Logging in...';
+                elements.loginBtn.disabled = true;
+
+                const response = await fetch(`${API_BASE}/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: email,
+                        password: password
+                    })
+                });
+
+                if (response.ok) {
+                    app.adminToken = await response.text();
+                    app.isLoggedIn = true;
+                    // Persist token in localStorage
+                    localStorage.setItem('sv_admin_token', app.adminToken);
+
+                    // Hide login section and show main content
+                    elements.loginSection.style.display = 'none';
+                    elements.mainContent.style.display = 'block';
+
+                    showToast('Successfully logged in as admin!', 'success');
+
+                    // Load initial data
+                    await loadDashboardData();
+                } else {
+                    throw new Error('Invalid credentials');
+                }
+            } catch (error) {
+                showToast('Login failed. Please check your credentials.', 'danger');
+            } finally {
+                elements.loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login to Admin Panel';
+                elements.loginBtn.disabled = false;
+            }
+            showLogoutBtn();
+        }
+
+        // Data Loading
+        async function loadDashboardData() {
+            try {
+                // Load partners data
+                await loadPartners();
+
+                // Update stats
+                updateDashboardStats();
+
+                // Populate recent activity
+                populateRecentActivity();
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showToast('Error loading dashboard data', 'danger');
+            }
+        }
+
+        async function loadPartners() {
+            try {
+                const response = await fetch(`${API_BASE}/CompanyUsernames`, {
+                    headers: {
+                        'Authorization': `Bearer ${app.adminToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    app.data.partners = await response.json();
+
+                    // Update stats
+                    app.data.pendingVerifications = app.data.partners.filter(p => !p.isRegistration).length;
+                    app.data.verifiedPartners = app.data.partners.filter(p => p.isRegistration).length;
+
+                    // Populate partner grid
+                    populatePartnerGrid();
+                    updateDashboardStats();
+                }
+            } catch (error) {
+                console.error('Error loading partners:', error);
+            }
+        }
+
+        function updateDashboardStats() {
+            elements.pendingVerifications.textContent = app.data.pendingVerifications;
+            elements.verifiedPartners.textContent = app.data.verifiedPartners;
+            elements.totalUsers.textContent = app.data.totalUsers || 1247;
+            elements.activeConsents.textContent = app.data.activeConsents || 3456;
+        }
+
+        function populateRecentActivity() {
+            const tbody = elements.activityTable;
+            tbody.innerHTML = '';
+
+            app.data.recentActivity.forEach(activity => {
+                const row = document.createElement('tr');
+                const statusClass = activity.status === 'success' ? 'success' :
+                    activity.status === 'warning' ? 'warning' : 'info';
+                const statusIcon = activity.status === 'success' ? 'check' :
+                    activity.status === 'warning' ? 'exclamation-triangle' : 'info-circle';
+
+                row.innerHTML = `
+                    <td>${activity.timestamp}</td>
+                    <td><strong>${activity.action}</strong></td>
+                    <td>${activity.target}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">
+                            <i class="fas fa-${statusIcon}"></i>
+                            ${activity.status.charAt(0).toUpperCase() + activity.status.slice(1)}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function populatePartnerGrid() {
+            const grid = elements.partnerGrid;
+            grid.innerHTML = '';
+
+            // Separate partners
+            const unverifiedPartners = app.data.partners.filter(p => !p.isRegistration);
+            const verifiedPartners = app.data.partners.filter(p => p.isRegistration);
+
+            // Add header for unverified partners if any
+            if (unverifiedPartners.length > 0) {
+                const unverifiedHeader = document.createElement('div');
+                unverifiedHeader.style.gridColumn = '1/-1';
+                unverifiedHeader.style.fontWeight = 'bold';
+                unverifiedHeader.style.fontSize = '1.1rem';
+                unverifiedHeader.style.margin = '1.5rem 0 0.5rem 0';
+                unverifiedHeader.textContent = 'Pending Verification';
+                grid.appendChild(unverifiedHeader);
+                unverifiedPartners.forEach(partner => {
+                    const card = document.createElement('div');
+                    card.className = 'partner-card';
+                    const initial = partner.username.charAt(0).toUpperCase();
+                    const statusBadge = '<span class="status-badge warning"><i class="fas fa-clock"></i> Pending</span>';
+                    // Compliance note
+                    let complianceNote = '';
+                    if (typeof partner.companyAge === 'number' && partner.companyAge <= 10) {
+                        complianceNote = '<div style="color:#ef4444;font-size:0.95rem;margin:0.5rem 0 0.5rem 0;"><i class="fas fa-exclamation-triangle"></i> Company violates compliance policy: not eligible for verification</div>';
+                    } else if (typeof partner.companyAge === 'number') {
+                        complianceNote = '<div style="color:#10b981;font-size:0.95rem;margin:0.5rem 0 0.5rem 0;"><i class="fas fa-check-circle"></i> Company is eligible for verification</div>';
+                    }
+                    card.innerHTML = `
+                        <div class="partner-card-header">
+                            <div class="partner-avatar">${initial}</div>
+                            <div class="partner-info">
+                                <h3>${partner.username}</h3>
+                                <p>${partner.email}</p>
+                            </div>
+                        </div>
+                        <div class="partner-details">
+                            <div class="partner-detail">
+                                <span class="partner-detail-label">Company Age</span>
+                                <span class="partner-detail-value">${partner.companyAge} years</span>
+                            </div>
+                            <div class="partner-detail">
+                                <span class="partner-detail-label">Status</span>
+                                <span class="partner-detail-value">${statusBadge}</span>
+                            </div>
+                            <div class="partner-detail">
+                                <span class="partner-detail-label">Registration Date</span>
+                                <span class="partner-detail-value">${generateRegistrationDate()}</span>
+                            </div>
+                            ${complianceNote}
+                        </div>
+                        <div class="partner-actions">
+                            <button class="btn btn-success" onclick="verifyPartner('${partner.username}')">
+                                <i class="fas fa-check"></i> Verify
+                            </button>
+                            <button class="btn btn-secondary" onclick="showPartnerDetails('${partner.username}')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+            // Add header for verified partners if any
+            if (verifiedPartners.length > 0) {
+                const verifiedHeader = document.createElement('div');
+                verifiedHeader.style.gridColumn = '1/-1';
+                verifiedHeader.style.fontWeight = 'bold';
+                verifiedHeader.style.fontSize = '1.1rem';
+                verifiedHeader.style.margin = '2.5rem 0 0.5rem 0';
+                verifiedHeader.textContent = 'Verified Partners';
+                grid.appendChild(verifiedHeader);
+                verifiedPartners.forEach(partner => {
+                    const card = document.createElement('div');
+                    card.className = 'partner-card';
+                    const initial = partner.username.charAt(0).toUpperCase();
+                    const statusBadge = '<span class="status-badge success"><i class="fas fa-check"></i> Verified</span>';
+                    card.innerHTML = `
+                        <div class="partner-card-header">
+                            <div class="partner-avatar">${initial}</div>
+                            <div class="partner-info">
+                                <h3>${partner.username}</h3>
+                                <p>${partner.email}</p>
+                            </div>
+                        </div>
+                        <div class="partner-details">
+                            <div class="partner-detail">
+                                <span class="partner-detail-label">Company Age</span>
+                                <span class="partner-detail-value">${partner.companyAge} years</span>
+                            </div>
+                            <div class="partner-detail">
+                                <span class="partner-detail-label">Status</span>
+                                <span class="partner-detail-value">${statusBadge}</span>
+                            </div>
+                            <div class="partner-detail">
+                                <span class="partner-detail-label">Registration Date</span>
+                                <span class="partner-detail-value">${generateRegistrationDate()}</span>
+                            </div>
+                        </div>
+                        <div class="partner-actions">
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-check"></i> Verified
+                            </button>
+                            <button class="btn btn-secondary" onclick="showPartnerDetails('${partner.username}')">
+                                <i class="fas fa-eye"></i> View Details
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+        }
+
+        // Partner Details Modal Management
+        async function showPartnerDetails(username) {
+            const partner = app.data.partners.find(p => p.username === username);
+            if (!partner) return;
+
+            // Decryption mapping (must match registration logic)
+            const encMap = {
+              '0': "@!#45",  '1': "$#$234", '2': "QwEr2", '3': "ZxCv3",
+              '4': "MnBv4",  '5': "PoIj5",  '6': "LkJh6", '7': "UuYt7",
+              '8': "AaSs8",  '9': "DdFf9",
+              'a': "GhJk1",  'b': "ZxXc2",  'c': "VvBb3", 'd': "CcNn4",
+              'e': "MmQq5",  'f': "WwEe6",  'g': "RrTt7", 'h': "YyUu8",
+              'i': "IiOo9",  'j': "PpLl0",  'k': "KkJj1", 'l': "HhGg2",
+              'm': "FfDd3",  'n': "SsAa4",  'o': "ZzXx5", 'p': "CcVv6",
+              'q': "BbNn7",  'r': "MmKk8",  's': "JjHh9", 't': "GgFf0",
+              'u': "DdSs1",  'v': "AaZz2",  'w': "XxCc3", 'x': "VvBb4",
+              'y': "NnMm5",  'z': "LlKk6",
+              ' ': "SPC",  '.': "DOT",  ',': "COM", '!': "EXC"
+            };
+            const decMap = {};
+            for (const [ch, tok] of Object.entries(encMap)) {
+              decMap[tok] = ch;
+            }
+            function decrypt(cipher) {
+              let plain = "";
+              let buffer = "";
+              for (const c of cipher) {
+                buffer += c;
+                if (buffer in decMap) {
+                  plain += decMap[buffer];
+                  buffer = "";
+                }
+              }
+              if (buffer.length > 0) {
+                console.warn(`Leftover buffer after decryption: '${buffer}'`);
+              }
+              return plain;
+            }
+
+            const modal = document.getElementById('partnerModal');
+            const modalTitle = document.getElementById('partnerModalTitle');
+            const modalBody = document.getElementById('partnerModalBody');
+
+            modalTitle.textContent = `${username} - Partner Details`;
+
+            // Show loading while fetching
+            modalBody.innerHTML = '<div style="padding:2rem;text-align:center;">Loading company details...</div>';
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            try {
+                const resp = await fetch(`http://192.168.230.123:8080/company/${username}`, {
+                    headers: {
+                        'Authorization': `Bearer ${app.adminToken}`
+                    }
+                });
+                if (!resp.ok) throw new Error('Failed to fetch company details');
+                const company = await resp.json();
+
+                // Decrypt all fields except companyName
+                function tryDecrypt(val) {
+                  if (!val) return '';
+                  try {
+                    return decrypt(val);
+                  } catch (e) {
+                    return val;
+                  }
+                }
+
+                modalBody.innerHTML = `
+                    <div class="partner-detail-section">
+                        <h3 class="partner-detail-section-title">
+                            <i class="fas fa-building"></i>
+                            Company Information
+                        </h3>
+                        <div class="partner-detail-grid">
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">Company Name</div><div class="partner-detail-item-value">${company.companyName || ''}</div></div>
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">GST Number</div><div class="partner-detail-item-value">${tryDecrypt(company.gstNumber)}</div></div>
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">Description</div><div class="partner-detail-item-value">${tryDecrypt(company.description)}</div></div>
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">Address</div><div class="partner-detail-item-value">${tryDecrypt(company.address)}</div></div>
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">Contact Email</div><div class="partner-detail-item-value">${tryDecrypt(company.contactEmail)}</div></div>
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">Contact Phone</div><div class="partner-detail-item-value">${tryDecrypt(company.contactPhone)}</div></div>
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">Website</div><div class="partner-detail-item-value">${tryDecrypt(company.website)}</div></div>
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">Industry</div><div class="partner-detail-item-value">${tryDecrypt(company.industry)}</div></div>
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">CIN ID</div><div class="partner-detail-item-value">${tryDecrypt(company.cinId)}</div></div>
+                            <div class="partner-detail-item"><div class="partner-detail-item-label">DIN ID</div><div class="partner-detail-item-value">${tryDecrypt(company.dinId)}</div></div>
+                        </div>
+                    </div>
+                    <div class="partner-actions-modal">
+                        ${!partner.isRegistration ?
+                        `<button class="btn btn-success" onclick="verifyPartnerFromModal('${partner.username}')">
+                                <i class="fas fa-check"></i> Verify Partner
+                            </button>` :
+                        `<button class="btn btn-danger" onclick="revokePartnerVerification('${partner.username}')">
+                                <i class="fas fa-times"></i> Revoke Verification
+                            </button>`
+                    }
+                        <button class="btn btn-secondary" onclick="downloadPartnerReport('${partner.username}')">
+                            <i class="fas fa-download"></i> Download Report
+                        </button>
+                        <button class="btn btn-secondary" onclick="closePartnerModal()">
+                            <i class="fas fa-times"></i> Close
+                        </button>
+                    </div>
+                `;
+            } catch (err) {
+                modalBody.innerHTML = `<div style='color:red;padding:2rem;text-align:center;'>Failed to load company details.</div>`;
+            }
+        }
+
+        function closePartnerModal() {
+            const modal = document.getElementById('partnerModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Helper functions for generating realistic data
+        function generatePartnerHistory(partner) {
+            const baseHistory = [
+                {
+                    action: 'Partner Registration',
+                    timestamp: generateRegistrationDate(),
+                    description: 'Partner account was created and initial verification documents were submitted.'
+                }
+            ];
+
+            if (partner.isRegistration) {
+                // Verified partner history
+                return [
+                    ...baseHistory,
+                    {
+                        action: 'Document Verification',
+                        timestamp: generatePastDate(5, 15),
+                        description: 'All required documents were reviewed and approved by the compliance team.'
+                    },
+                    {
+                        action: 'Partner Verified',
+                        timestamp: generatePastDate(3, 10),
+                        description: 'Partner verification completed successfully. Full access to SurakshaVault APIs granted.'
+                    },
+                    {
+                        action: 'First Data Request',
+                        timestamp: generatePastDate(1, 7),
+                        description: 'Partner made their first successful data access request.'
+                    },
+                    {
+                        action: 'Compliance Check',
+                        timestamp: generatePastDate(0, 3),
+                        description: 'Routine compliance check completed. All security standards met.'
+                    }
+                ];
+            } else {
+                // Pending partner history
+                return [
+                    ...baseHistory,
+                    {
+                        action: 'Document Submission',
+                        timestamp: generatePastDate(2, 8),
+                        description: 'Partner submitted required verification documents for review.'
+                    },
+                    {
+                        action: 'Initial Review',
+                        timestamp: generatePastDate(1, 5),
+                        description: 'Documents are currently under review by the compliance team.'
+                    },
+                    {
+                        action: 'Pending Verification',
+                        timestamp: generatePastDate(0, 2),
+                        description: 'Awaiting final approval from admin team. All preliminary checks passed.'
+                    }
+                ];
+            }
+        }
+
+        function generateRegistrationDate() {
+            const days = Math.floor(Math.random() * 90) + 10; // 10-100 days ago
+            const date = new Date();
+            date.setDate(date.getDate() - days);
+            return date.toLocaleDateString();
+        }
+
+        function generatePastDate(minDays, maxDays) {
+            const days = Math.floor(Math.random() * (maxDays - minDays)) + minDays;
+            const date = new Date();
+            date.setDate(date.getDate() - days);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function generatePartnerId(username) {
+            return username.substring(0, 3).toUpperCase() + Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+        }
+
+        function generateRandomStat(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+        function generateLastActivity() {
+            const hours = Math.floor(Math.random() * 48) + 1;
+            return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+        }
+
+        // Modal action functions
+        async function verifyPartner(username) {
+            const res = await fetch(`${API_BASE}/PartnerRegistration/${username}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + app.adminToken
+                }
+            });
+            showToast(res.ok ? `${username} has been verified!` : 'Verification failed', res.ok ? 'success' : 'danger');
+            await loadPartners();
+        }
+        async function verifyPartnerFromModal(username) {
+            await verifyPartner(username);
+            closePartnerModal();
+        }
+
+        async function revokePartnerVerification(username) {
+            if (confirm(`Are you sure you want to revoke verification for ${username}? This action cannot be undone.`)) {
+                try {
+                    // Here you would make an API call to revoke verification
+                    // For now, we'll simulate it
+                    showToast(`Verification revoked for ${username}`, 'warning');
+
+                    // Add to recent activity
+                    app.data.recentActivity.unshift({
+                        timestamp: new Date().toLocaleString(),
+                        action: 'Verification Revoked',
+                        target: username,
+                        status: 'warning'
+                    });
+
+                    // Update partner status locally (in real app, this would come from API)
+                    const partner = app.data.partners.find(p => p.username === username);
+                    if (partner) {
+                        partner.isRegistration = false;
+                    }
+
+                    await loadPartners();
+                    populateRecentActivity();
+                    closePartnerModal();
+                } catch (error) {
+                    showToast('Failed to revoke verification. Please try again.', 'danger');
+                }
+            }
+        }
+
+        function downloadPartnerReport(username) {
+            showToast(`Generating report for ${username}...`, 'info');
+
+            // Simulate report generation
+            setTimeout(() => {
+                showToast(`Report for ${username} has been downloaded`, 'success');
+            }, 2000);
+        }
+
+        // Section Navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.dashboard-section').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show selected section
+            const targetSection = document.getElementById(`${sectionName}Section`);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+            }
+
+            // Update active nav link
+            document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            const activeLink = document.querySelector(`[data-section="${sectionName}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+
+            app.currentSection = sectionName;
+        }
+
+        // Event Listeners
+        function initEventListeners() {
+            // Theme toggle
+            elements.themeToggle.addEventListener('click', toggleTheme);
+
+            // Sidebar toggle
+            elements.sidebarToggle.addEventListener('click', toggleSidebar);
+            elements.overlay.addEventListener('click', closeSidebar);
+
+            // Login form
+            elements.loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('adminEmail').value;
+                const password = document.getElementById('adminPassword').value;
+                await adminLogin(email, password);
+            });
+
+            // Toast close
+            elements.toastClose.addEventListener('click', () => {
+                elements.toast.classList.remove('show');
+            });
+
+            // Navigation links
+            document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = link.getAttribute('data-section');
+                    if (section) {
+                        showSection(section);
+                        closeSidebar();
+                    }
+                });
+            });
+
+            // Refresh partners button
+            if (elements.refreshPartners) {
+                elements.refreshPartners.addEventListener('click', async () => {
+                    elements.refreshPartners.innerHTML = '<span class="loading"></span> Refreshing...';
+                    await loadPartners();
+                    elements.refreshPartners.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                });
+            }
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && app.sidebarOpen) {
+                    closeSidebar();
+                }
+            });
+
+            // Partner modal event listeners
+            const partnerModal = document.getElementById('partnerModal');
+            const partnerModalClose = document.getElementById('partnerModalClose');
+            const partnerModalOverlay = document.getElementById('partnerModalOverlay');
+
+            if (partnerModalClose) {
+                partnerModalClose.addEventListener('click', closePartnerModal);
+            }
+
+            if (partnerModalOverlay) {
+                partnerModalOverlay.addEventListener('click', closePartnerModal);
+            }
+
+            // Close modal on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (partnerModal && partnerModal.style.display === 'flex') {
+                        closePartnerModal();
+                    } else if (app.sidebarOpen) {
+                        closeSidebar();
+                    }
+                }
+            });
+        }
+
+        function showLogoutBtn() {
+            if (!document.getElementById('adminLogoutBtn')) {
+                const navbarRight = document.querySelector('.navbar-right');
+                const logoutBtn = document.createElement('button');
+                logoutBtn.className = 'navbar-btn';
+                logoutBtn.id = 'adminLogoutBtn';
+                logoutBtn.title = 'Logout';
+                logoutBtn.innerHTML = '<i class="fas fa-sign-out-alt"></i>';
+                navbarRight.appendChild(logoutBtn);
+                elements.logoutBtn = logoutBtn;
+                logoutBtn.addEventListener('click', logoutAdmin);
+            } else {
+                document.getElementById('adminLogoutBtn').style.display = '';
+            }
+        }
+        function hideLogoutBtn() {
+            const btn = document.getElementById('adminLogoutBtn');
+            if (btn) btn.style.display = 'none';
+        }
+
+        // Initialize Application
+        function init() {
+            initTheme();
+            initEventListeners();
+
+            // Set initial admin avatar
+            elements.userAvatar.textContent = 'A';
+
+            // Add fade-in animation to elements
+            setTimeout(() => {
+                document.querySelectorAll('.fade-in').forEach(el => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                });
+            }, 100);
+
+            hideLogoutBtn();
+            const savedToken = localStorage.getItem('sv_admin_token');
+            if (savedToken) {
+                app.adminToken = savedToken;
+                app.isLoggedIn = true;
+                elements.loginSection.style.display = 'none';
+                elements.mainContent.style.display = 'block';
+                showLogoutBtn();
+                loadDashboardData();
+            } else {
+                hideLogoutBtn();
+            }
+        }
+
+        // Logout function
+        function logoutAdmin() {
+            app.adminToken = '';
+            app.isLoggedIn = false;
+            localStorage.removeItem('sv_admin_token');
+            elements.mainContent.style.display = 'none';
+            elements.loginSection.style.display = 'flex';
+
+            // Ensure login container is flex and centered
+            elements.loginSection.style.justifyContent = 'center';
+            elements.loginSection.style.alignItems = 'center';
+            elements.loginSection.style.minHeight = '100vh';
+
+            // Reset fade-in styles for login card and re-trigger animation
+            const loginCard = elements.loginSection.querySelector('.login-card');
+            if (loginCard) {
+                loginCard.style.opacity = '0';
+                loginCard.style.transform = 'translateY(40px)';
+                loginCard.style.margin = '0 auto';
+                loginCard.style.position = 'relative';
+                // Force reflow to restart animation
+                void loginCard.offsetWidth;
+                setTimeout(() => {
+                    loginCard.style.opacity = '1';
+                    loginCard.style.transform = 'translateY(0)';
+                }, 50);
+            }
+
+            showToast('Logged out successfully.', 'info');
+            hideLogoutBtn();
+        }
+
+        // Start the application
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Make functions globally available
+        window.showPartnerDetails = showPartnerDetails;
+        window.closePartnerModal = closePartnerModal;
+        window.verifyPartnerFromModal = verifyPartnerFromModal;
+        window.revokePartnerVerification = revokePartnerVerification;
+        window.downloadPartnerReport = downloadPartnerReport;
+        window.verifyPartner = verifyPartner;
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Toast Notification Styles -->
+    <style>
+        .toast {
+            position: fixed;
+            top: 2.5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            min-width: 260px;
+            max-width: 400px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 1.1rem 1.7rem;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast .toast-icon {
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .toast .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .toast .toast-close:hover {
+            color: var(--danger);
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Profile | SurakshaVault</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light Mode Colors */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-inverse: #ffffff;
+
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-overlay: rgba(0, 0, 0, 0.5);
+
+            --border: #e5e7eb;
+            --border-light: #f3f4f6;
+            --border-focus: #6366f1;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+
+            --navbar-height: 4rem;
+        }
+
+        /* Dark Mode Colors */
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --primary-light: #c7d2fe;
+            --secondary: #34d399;
+            --accent: #fbbf24;
+            --danger: #f87171;
+            --warning: #fbbf24;
+            --success: #34d399;
+            --info: #60a5fa;
+
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --text-inverse: #111827;
+
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --bg-card: #1e293b;
+            --bg-overlay: rgba(0, 0, 0, 0.8);
+
+            --border: #334155;
+            --border-light: #475569;
+            --border-focus: #818cf8;
+
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-muted);
+        }
+
+        /* Enhanced Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--navbar-height);
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] .navbar {
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .navbar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .brand-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .brand-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-center {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .breadcrumb a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary);
+        }
+
+        .breadcrumb-separator {
+            color: var(--text-muted);
+        }
+
+        .breadcrumb-current {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.5rem;
+            padding: 0 1rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 500;
+            gap: 0.5rem;
+        }
+
+        .navbar-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transform: translateY(-1px);
+        }
+
+        .navbar-btn.primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .navbar-btn.primary:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: var(--navbar-height);
+            padding: 2rem;
+            min-height: calc(100vh - var(--navbar-height));
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Profile Layout */
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 20rem 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* Enhanced Profile Sidebar */
+        .profile-sidebar {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-2xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: calc(var(--navbar-height) + 2rem);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .profile-sidebar:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .profile-avatar {
+            width: 5rem;
+            height: 5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .profile-name {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .profile-name h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .profile-name p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .profile-stats {
+            border-top: 1px solid var(--border-light);
+            padding-top: 1.5rem;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-verified {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        /* Main Profile Content */
+        .profile-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        /* Enhanced Content Cards */
+        .content-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .content-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .content-card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-secondary);
+        }
+
+        .content-card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .content-card-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary);
+            color: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        .content-card-body {
+            padding: 2rem;
+        }
+
+        /* Enhanced Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            position: relative;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .info-item:hover {
+            border-color: var(--border-focus);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .info-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: 0.025em;
+            transition: all 0.3s ease;
+            word-break: break-word;
+        }
+
+        /* Enhanced Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1.5rem 2rem;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-focus);
+        }
+
+        /* Loading, Error, and Login States */
+        .state-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-2xl);
+            padding: 3rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .spinner {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .state-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .state-icon.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .state-icon.login {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .state-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .state-message {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Update Form Styles */
+        .update-form {
+            display: none;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 2rem;
+        }
+
+        .update-form.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-input,
+        .form-textarea {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 4rem;
+        }
+
+        /* Success/Error Messages */
+        .message {
+            padding: 1rem;
+            border-radius: var(--radius-md);
+            margin: 1rem 0;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .profile-sidebar {
+                position: static;
+                order: 2;
+            }
+
+            .navbar-center {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar-container {
+                padding: 0 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .info-grid,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(1rem);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Enhanced Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-left">
+                <a href="#" class="brand">
+                    <div class="brand-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <span class="brand-text">SurakshaVault</span>
+                </a>
+            </div>
+
+            <div class="navbar-center">
+                <div class="breadcrumb">
+                    <a href="#">Dashboard</a>
+                    <span class="breadcrumb-separator">/</span>
+                    <span class="breadcrumb-current">Company Profile</span>
+                </div>
+            </div>
+
+            <div class="navbar-right">
+                <button class="navbar-btn" id="refresh-btn" title="Refresh Profile">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+
+                <button class="navbar-btn" id="theme-toggle" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+
+                <button class="navbar-btn" id="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Loading State -->
+            <div id="loading-section" class="state-container">
+                <div class="spinner"></div>
+                <h2 class="state-title">Loading Company Profile</h2>
+                <p class="state-message">Fetching your company information...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-section" class="state-container hidden">
+                <div class="state-icon error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h2 class="state-title">Profile Unavailable</h2>
+                <p id="error-message" class="state-message">Unable to load company profile information. Please try again
+                    later.</p>
+            </div>
+
+            <!-- Login Prompt -->
+            <div id="login-prompt" class="state-container hidden">
+                <div class="state-icon login">
+                    <i class="fas fa-building-lock"></i>
+                </div>
+                <h2 class="state-title">Access Company Profile</h2>
+                <p class="state-message">
+                    Please ensure you're logged in to view your company profile information.
+                </p>
+            </div>
+
+            <!-- Profile Content -->
+            <div id="profile-content" class="profile-layout hidden">
+                <!-- Enhanced Profile Sidebar -->
+                <div class="profile-sidebar">
+                    <div class="profile-avatar">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="profile-name">
+                        <h2 id="company-name">Loading...</h2>
+                        <p>Company Profile</p>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Profile Status</span>
+                            <span id="profile-status" class="status-badge status-verified">
+                                <i class="fas fa-check-circle"></i>
+                                Active
+                            </span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Last Updated</span>
+                            <span class="stat-value" id="last-updated">Today</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Data Security</span>
+                            <span class="stat-value">High</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Profile Content -->
+                <div class="profile-main">
+                    <!-- Company Information Section -->
+                    <div class="content-card">
+                        <div class="content-card-header">
+                            <h3 class="content-card-title">
+                                <div class="content-card-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                Company Information
+                            </h3>
+                        </div>
+                        <div class="content-card-body">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-file-invoice"></i>
+                                        GST Number
+                                    </div>
+                                    <div id="gst-number" class="info-value">Not provided</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-info-circle"></i>
+                                        Description
+                                    </div>
+                                    <div id="description" class="info-value">Not provided</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        Address
+                                    </div>
+                                    <div id="address" class="info-value">Not provided</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-envelope"></i>
+                                        Contact Email
+                                    </div>
+                                    <div id="contact-email" class="info-value">Not provided</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-phone"></i>
+                                        Contact Phone
+                                    </div>
+                                    <div id="contact-phone" class="info-value">Not provided</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-globe"></i>
+                                        Website
+                                    </div>
+                                    <div id="website" class="info-value">Not provided</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-industry"></i>
+                                        Industry
+                                    </div>
+                                    <div id="industry" class="info-value">Not provided</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-id-card"></i>
+                                        CIN ID
+                                    </div>
+                                    <div id="cin-id" class="info-value">Not provided</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-id-badge"></i>
+                                        DIN ID
+                                    </div>
+                                    <div id="din-id" class="info-value">Not provided</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" id="update-btn" disabled>
+                                <i class="fas fa-edit"></i>
+                                Update Profile
+                            </button>
+                            <button class="btn btn-primary" id="fetch-consents-btn">
+                                <i class="fas fa-file-signature"></i>
+                                Fetch Consents
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Update Form (Hidden by default) -->
+                    <div class="update-form" id="update-form">
+                        <div class="content-card-header">
+                            <h3 class="content-card-title">
+                                <div class="content-card-icon">
+                                    <i class="fas fa-edit"></i>
+                                </div>
+                                Update Company Information
+                            </h3>
+                        </div>
+                        <form id="company-form">
+                            <div class="content-card-body">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label class="form-label" for="form-gst-number">
+                                            <i class="fas fa-file-invoice"></i>
+                                            GST Number
+                                        </label>
+                                        <input type="text" id="form-gst-number" class="form-input"
+                                            placeholder="Enter GST number">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="form-contact-email">
+                                            <i class="fas fa-envelope"></i>
+                                            Contact Email
+                                        </label>
+                                        <input type="email" id="form-contact-email" class="form-input"
+                                            placeholder="Enter contact email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="form-contact-phone">
+                                            <i class="fas fa-phone"></i>
+                                            Contact Phone
+                                        </label>
+                                        <input type="text" id="form-contact-phone" class="form-input"
+                                            placeholder="Enter contact phone">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="form-website">
+                                            <i class="fas fa-globe"></i>
+                                            Website
+                                        </label>
+                                        <input type="text" id="form-website" class="form-input"
+                                            placeholder="Enter website URL">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="form-industry">
+                                            <i class="fas fa-industry"></i>
+                                            Industry
+                                        </label>
+                                        <input type="text" id="form-industry" class="form-input"
+                                            placeholder="Enter industry">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="form-cin-id">
+                                            <i class="fas fa-id-card"></i>
+                                            CIN ID
+                                        </label>
+                                        <input type="text" id="form-cin-id" class="form-input"
+                                            placeholder="Enter CIN ID">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label" for="form-din-id">
+                                            <i class="fas fa-id-badge"></i>
+                                            DIN ID
+                                        </label>
+                                        <input type="text" id="form-din-id" class="form-input"
+                                            placeholder="Enter DIN ID">
+                                    </div>
+                                    <div class="form-group" style="grid-column: 1 / -1;">
+                                        <label class="form-label" for="form-description">
+                                            <i class="fas fa-info-circle"></i>
+                                            Description
+                                        </label>
+                                        <textarea id="form-description" class="form-textarea" rows="3"
+                                            placeholder="Enter company description"></textarea>
+                                    </div>
+                                    <div class="form-group" style="grid-column: 1 / -1;">
+                                        <label class="form-label" for="form-address">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            Address
+                                        </label>
+                                        <textarea id="form-address" class="form-textarea" rows="2"
+                                            placeholder="Enter company address"></textarea>
+                                    </div>
+                                </div>
+                                <div id="form-message"></div>
+                            </div>
+                            <div class="action-buttons">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Save Changes
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="cancel-update-btn">
+                                    <i class="fas fa-times"></i>
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        // Encryption/Decryption mapping (must match registration logic)
+        const encMap = {
+          '0': "@!#45",  '1': "$#$234", '2': "QwEr2", '3': "ZxCv3",
+          '4': "MnBv4",  '5': "PoIj5",  '6': "LkJh6", '7': "UuYt7",
+          '8': "AaSs8",  '9': "DdFf9",
+          'a': "GhJk1",  'b': "ZxXc2",  'c': "VvBb3", 'd': "CcNn4",
+          'e': "MmQq5",  'f': "WwEe6",  'g': "RrTt7", 'h': "YyUu8",
+          'i': "IiOo9",  'j': "PpLl0",  'k': "KkJj1", 'l': "HhGg2",
+          'm': "FfDd3",  'n': "SsAa4",  'o': "ZzXx5", 'p': "CcVv6",
+          'q': "BbNn7",  'r': "MmKk8",  's': "JjHh9", 't': "GgFf0",
+          'u': "DdSs1",  'v': "AaZz2",  'w': "XxCc3", 'x': "VvBb4",
+          'y': "NnMm5",  'z': "LlKk6",
+          ' ': "SPC",  '.': "DOT",  ',': "COM", '!': "EXC", '@': "AYWT",
+        };
+        const decMap = {};
+        for (const [ch, tok] of Object.entries(encMap)) {
+          decMap[tok] = ch;
+        }
+
+        // Encrypts plain text by concatenating tokens
+        function encrypt(plain) {
+          let cipher = "";
+          for (const ch of plain) {
+            if (!(ch in encMap)) {
+              console.warn(`No mapping for '${ch}', skipping.`);
+              continue;
+            }
+            cipher += encMap[ch];
+          }
+          return cipher;
+        }
+
+        // Decrypts cipher text by scanning and matching tokens
+        function decrypt(cipher) {
+          let plain = "";
+          let buffer = "";
+          for (const c of cipher) {
+            buffer += c;
+            if (buffer in decMap) {
+              plain += decMap[buffer];
+              buffer = "";
+            }
+          }
+          if (buffer.length > 0) {
+            console.warn(`Leftover buffer after decryption: '${buffer}'`);
+          }
+          return plain;
+        }
+        // API Configuration - Using your original backend
+        import API_BASE_URL from './api-config.js';
+        const apiBase = `${API_BASE_URL}/company`;
+        const tokenKey = 'sv_token';
+        const usernameKey = 'sv_username';
+
+        // DOM Elements
+        const loadingSection = document.getElementById('loading-section');
+        const profileContent = document.getElementById('profile-content');
+        const errorSection = document.getElementById('error-section');
+        const loginPrompt = document.getElementById('login-prompt');
+        const updateForm = document.getElementById('update-form');
+
+        // Profile elements
+        const companyNameElement = document.getElementById('company-name');
+        const gstNumberElement = document.getElementById('gst-number');
+        const descriptionElement = document.getElementById('description');
+        const addressElement = document.getElementById('address');
+        const contactEmailElement = document.getElementById('contact-email');
+        const contactPhoneElement = document.getElementById('contact-phone');
+        const websiteElement = document.getElementById('website');
+        const industryElement = document.getElementById('industry');
+        const cinIdElement = document.getElementById('cin-id');
+        const dinIdElement = document.getElementById('din-id');
+        const lastUpdatedElement = document.getElementById('last-updated');
+
+        // Form elements
+        const companyForm = document.getElementById('company-form');
+        const formMessage = document.getElementById('form-message');
+
+        // Buttons
+        const updateBtn = document.getElementById('update-btn');
+        const cancelUpdateBtn = document.getElementById('cancel-update-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        let companyData = null;
+
+        // Theme Management
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('sv_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('sv_theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = themeToggle.querySelector('i');
+            if (theme === 'dark') {
+                icon.className = 'fas fa-sun';
+                themeToggle.title = 'Switch to light mode';
+            } else {
+                icon.className = 'fas fa-moon';
+                themeToggle.title = 'Switch to dark mode';
+            }
+        }
+
+        // Check if user is logged in
+        function checkLoginStatus() {
+            const token = localStorage.getItem(tokenKey);
+            const username = localStorage.getItem(usernameKey);
+            return !!(token && username);
+        }
+
+        // Show different states
+        function showLoading() {
+            loadingSection.classList.remove('hidden');
+            profileContent.classList.add('hidden');
+            errorSection.classList.add('hidden');
+            loginPrompt.classList.add('hidden');
+        }
+
+        function showProfileContent() {
+            loadingSection.classList.add('hidden');
+            errorSection.classList.add('hidden');
+            loginPrompt.classList.add('hidden');
+            profileContent.classList.remove('hidden');
+            profileContent.classList.add('fade-in');
+        }
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            loadingSection.classList.add('hidden');
+            profileContent.classList.add('hidden');
+            loginPrompt.classList.add('hidden');
+            errorSection.classList.remove('hidden');
+            errorSection.classList.add('fade-in');
+        }
+
+        function showLoginPrompt() {
+            loadingSection.classList.add('hidden');
+            profileContent.classList.add('hidden');
+            errorSection.classList.add('hidden');
+            loginPrompt.classList.remove('hidden');
+            loginPrompt.classList.add('fade-in');
+        }
+
+        // Show message in form
+        function showMessage(msg, isError = false) {
+            formMessage.textContent = msg;
+            formMessage.className = isError ? 'message error' : 'message success';
+        }
+
+        // Fetch company data
+        async function fetchCompany() {
+            const name = localStorage.getItem(usernameKey);
+            if (!name) {
+                showError('Username not found in localStorage.');
+                return;
+            }
+
+            try {
+                showLoading();
+
+                const token = localStorage.getItem(tokenKey);
+                const response = await fetch(`${apiBase}/${encodeURIComponent(name)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const text = await response.text();
+                if (!response.ok) {
+                    throw new Error(`Status ${response.status}: ${text}`);
+                }
+
+                companyData = JSON.parse(text);
+                updateProfileUI(companyData);
+                showProfileContent();
+
+                // Enable update button
+                updateBtn.disabled = false;
+
+                // showToast('✅ Company data loaded successfully!'); // Notification removed
+
+            } catch (error) {
+                console.error(error);
+                showError(error.message);
+            }
+        }
+
+        // Update profile UI with data
+        function updateProfileUI(data) {
+            companyNameElement.textContent = data.companyName || localStorage.getItem(usernameKey) || 'Unknown Company';
+            // Show decrypted if looks encrypted, else as-is
+            function tryDecrypt(val) {
+                if (!val) return 'Not provided';
+                // Heuristic: if value contains any known token, decrypt, else show as-is
+                const tokens = Object.values(encMap);
+                let isEncrypted = false;
+                for (const t of tokens) {
+                    if (val.includes(t)) {
+                        isEncrypted = true;
+                        break;
+                    }
+                }
+                if (isEncrypted) {
+                    try {
+                        return decrypt(val);
+                    } catch (e) {
+                        return val;
+                    }
+                } else {
+                    return val;
+                }
+            }
+            gstNumberElement.textContent = tryDecrypt(data.gstNumber);
+            descriptionElement.textContent = tryDecrypt(data.description);
+            addressElement.textContent = tryDecrypt(data.address);
+            contactEmailElement.textContent = tryDecrypt(data.contactEmail);
+            contactPhoneElement.textContent = tryDecrypt(data.contactPhone);
+            websiteElement.textContent = tryDecrypt(data.website);
+            industryElement.textContent = tryDecrypt(data.industry);
+            cinIdElement.textContent = tryDecrypt(data.cinId);
+            dinIdElement.textContent = tryDecrypt(data.dinId);
+            console.log('Company data:', data);
+            lastUpdatedElement.textContent = new Date().toLocaleDateString('en-IN');
+        }
+
+        // Set verification status badge
+        function setVerificationStatus(isRegistration) {
+            const profileStatus = document.getElementById('profile-status');
+            if (profileStatus) {
+                if (isRegistration === true) {
+                    profileStatus.className = 'status-badge status-verified';
+                    profileStatus.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+                } else {
+                    profileStatus.className = 'status-badge status-pending';
+                    profileStatus.innerHTML = '<i class="fas fa-clock"></i> You are yet to be verified by the admin';
+                }
+            }
+        }
+
+        // Fetch all companies and check verification for current user
+        async function checkVerificationStatus() {
+            const token = localStorage.getItem(tokenKey);
+            const username = localStorage.getItem(usernameKey);
+            if (!token || !username) {
+                showMessage('Authentication required.', true);
+                return;
+            }
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/partnerRegistration/${username}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                if (!res.ok) {
+                    throw new Error('Failed to fetch company verification status');
+                }
+                const data = await res.json();
+                setVerificationStatus(data.isRegistration);
+            } catch (err) {
+                showMessage('Error checking verification status', true);
+            }
+        }
+
+        // Populate form with current data
+function populateForm() {
+    if (!companyData) return;
+    function tryDecrypt(val) {
+        if (!val) return '';
+        // Heuristic: if value contains any known token, decrypt, else show as-is
+        const tokens = Object.values(encMap);
+        let isEncrypted = false;
+        for (const t of tokens) {
+            if (val.includes(t)) {
+                isEncrypted = true;
+                break;
+            }
+        }
+        if (isEncrypted) {
+            try {
+                return decrypt(val);
+            } catch (e) {
+                return val;
+            }
+        } else {
+            return val;
+        }
+    }
+    document.getElementById('form-gst-number').value = tryDecrypt(companyData.gstNumber);
+    document.getElementById('form-description').value = tryDecrypt(companyData.description);
+    document.getElementById('form-address').value = tryDecrypt(companyData.address);
+    document.getElementById('form-contact-email').value = tryDecrypt(companyData.contactEmail);
+    document.getElementById('form-contact-phone').value = tryDecrypt(companyData.contactPhone);
+    document.getElementById('form-website').value = tryDecrypt(companyData.website);
+    document.getElementById('form-industry').value = tryDecrypt(companyData.industry);
+    document.getElementById('form-cin-id').value = tryDecrypt(companyData.cinId);
+    document.getElementById('form-din-id').value = tryDecrypt(companyData.dinId);
+}
+
+        // Show/hide update form
+        function showUpdateForm() {
+            populateForm();
+            updateForm.classList.add('show');
+            updateForm.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideUpdateForm() {
+            updateForm.classList.remove('show');
+            formMessage.textContent = '';
+        }
+
+        // Update company data
+        async function updateCompany(formData) {
+            const token = localStorage.getItem(tokenKey);
+            const name = localStorage.getItem(usernameKey);
+
+            if (!name || !token) {
+                showMessage('Authentication required.', true);
+                return;
+            }
+
+
+            // Encrypt each field except companyName
+            const payload = {
+                companyName: name,
+                gstNumber: encrypt(formData.get('gstNumber') || ''),
+                description: encrypt(formData.get('description') || ''),
+                address: encrypt(formData.get('address') || ''),
+                contactEmail: encrypt(formData.get('contactEmail') || ''),
+                contactPhone: encrypt(formData.get('contactPhone') || ''),
+                website: encrypt(formData.get('website') || ''),
+                industry: encrypt(formData.get('industry') || ''),
+                cinId: encrypt(formData.get('cinId') || ''),
+                dinId: encrypt(formData.get('dinId') || '')
+            };
+
+            try {
+                const response = await fetch(apiBase, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const text = await response.text();
+                if (!response.ok) {
+                    throw new Error(`Status ${response.status}: ${text}`);
+                }
+
+                showMessage('✅ Company information updated successfully!');
+                // Redirect to companyprofile.html after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'companyprofile.html';
+                }, 2000);
+            } catch (error) {
+                console.error(error);
+                showMessage(error.message, true);
+            }
+        }
+
+        // Toast notification removed: no notification will be shown
+
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize theme
+            initializeTheme();
+
+            // Check login status
+            if (checkLoginStatus()) {
+                const username = localStorage.getItem(usernameKey);
+                companyNameElement.textContent = username || 'Company Profile';
+                fetchCompany(); // Automatically fetch company data on page load
+                // Also check verification status on load
+                checkVerificationStatus();
+            } else {
+                showLoginPrompt();
+            }
+
+            // Event listeners
+            themeToggle.addEventListener('click', toggleTheme);
+            updateBtn.addEventListener('click', showUpdateForm);
+            cancelUpdateBtn.addEventListener('click', hideUpdateForm);
+            refreshBtn.addEventListener('click', () => {
+                fetchCompany();
+                checkVerificationStatus();
+            });
+
+            // Fetch Consents button event
+            const fetchConsentsBtn = document.getElementById('fetch-consents-btn');
+            if (fetchConsentsBtn) {
+                fetchConsentsBtn.addEventListener('click', function () {
+                    window.location.href = 'fetchConsent.html';
+                });
+            }
+
+            // Logout button event
+            logoutBtn.addEventListener('click', function () {
+                // Remove token and username from localStorage
+                localStorage.removeItem(tokenKey);
+                localStorage.removeItem(usernameKey);
+                // Optionally, clear all localStorage (uncomment if needed)
+                // localStorage.clear();
+                // Redirect to login or reload page
+                window.location.href = 'auth.html';
+            });
+
+            // Add a button to manually check verification status (optional)
+            // Example: document.getElementById('profile-status').addEventListener('click', checkVerificationStatus);
+
+            // Form submission
+            companyForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(companyForm);
+
+                // Map form fields
+                const mappedFormData = new FormData();
+                mappedFormData.append('gstNumber', document.getElementById('form-gst-number').value);
+                mappedFormData.append('description', document.getElementById('form-description').value);
+                mappedFormData.append('address', document.getElementById('form-address').value);
+                mappedFormData.append('contactEmail', document.getElementById('form-contact-email').value);
+                mappedFormData.append('contactPhone', document.getElementById('form-contact-phone').value);
+                mappedFormData.append('website', document.getElementById('form-website').value);
+                mappedFormData.append('industry', document.getElementById('form-industry').value);
+                mappedFormData.append('cinId', document.getElementById('form-cin-id').value);
+                mappedFormData.append('dinId', document.getElementById('form-din-id').value);
+
+                await updateCompany(mappedFormData);
+            });
+
+            // Refresh button animation
+            refreshBtn.addEventListener('click', function () {
+                const icon = this.querySelector('i');
+                icon.style.animation = 'spin 1s linear';
+                setTimeout(() => {
+                    icon.style.animation = '';
+                }, 1000);
+            });
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function (e) {
+            // Ctrl/Cmd + R for refresh
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                e.preventDefault();
+                fetchCompany();
+            }
+
+            // Ctrl/Cmd + D for dark mode toggle
+            if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                e.preventDefault();
+                toggleTheme();
+            }
+
+            // Escape to close update form
+            if (e.key === 'Escape' && updateForm.classList.contains('show')) {
+                hideUpdateForm();
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>  
+  <meta charset="UTF-8">  
+  <title>Fetch & Update Company Info</title>  
+  <style>    
+    body {  
+      font-family: sans-serif;  
+      max-width: 600px;  
+      margin: auto;  
+      padding: 1rem;  
+      background-color: #fafafa;  
+    }    
+    label {  
+      display: block;  
+      margin-top: 1rem;  
+      font-weight: bold;  
+    }    
+    input, textarea, button {  
+      width: 100%;  
+      padding: 0.5rem;  
+      margin-top: 0.3rem;  
+      box-sizing: border-box;  
+      font-size: 1rem;  
+    }    
+    #actions {  
+      display: flex;  
+      gap: 1rem;  
+      margin-top: 1rem;  
+    }    
+    #actions button {  
+      flex: 1;  
+    }    
+    #updateSection {  
+      margin-top: 1.5rem;  
+      padding-top: 1rem;  
+      border-top: 1px solid #ddd;  
+      display: none;  
+    }    
+    #result {  
+      margin-top: 1.5rem;  
+      white-space: pre-wrap;  
+    }    
+    .error { color: #b00020; }    
+    .success { color: #087f23; }  
+  </style>
+</head>
+<body>
+  <h2>🔄 Fetch & Update Company Information</h2>
+  <p><strong>Company Username:</strong> <span id="displayUsername">Loading…</span></p>
+  
+  <!-- Only the Fetch button is visible initially -->
+  <div id="actions">
+    <button type="button" id="btnFetch">Fetch</button>
+  </div>
+  
+  <form id="companyForm">
+    <!-- Hidden until fetch succeeds -->
+    <div id="updateSection">
+      <label for="gstNumber">GST Number</label>
+      <input type="text" id="gstNumber">
+      
+      <label for="description">Description</label>
+      <textarea id="description" rows="3"></textarea>
+      
+      <label for="address">Address</label>
+      <textarea id="address" rows="2"></textarea>
+      
+      <label for="contactEmail">Contact Email</label>
+      <input type="email" id="contactEmail">
+      
+      <label for="contactPhone">Contact Phone</label>
+      <input type="text" id="contactPhone">
+      
+      <label for="website">Website</label>
+      <input type="text" id="website">
+      
+      <label for="industry">Industry</label>
+      <input type="text" id="industry">
+      
+      <label for="cinId">CIN ID</label>
+      <input type="text" id="cinId">
+      
+      <label for="dinId">DIN ID</label>
+      <input type="text" id="dinId">
+      
+      <div id="actions">
+        <button type="submit">Update</button>
+      </div>
+    </div>
+  </form>
+  
+  <div id="result"></div>
+  
+  <script>
+    const apiBase     = 'http://192.168.230.123:8080/company';
+    const tokenKey    = 'sv_token';
+    const usernameKey = 'sv_username';
+    
+    const form          = document.getElementById('companyForm');
+    const resultDiv     = document.getElementById('result');
+    const btnFetch      = document.getElementById('btnFetch');
+    const displayUser   = document.getElementById('displayUsername');
+    const updateSection = document.getElementById('updateSection');
+
+    // Show username on load
+    const username = localStorage.getItem(usernameKey);
+    displayUser.textContent = username || 'Not set';
+
+    function showMessage(msg, isError = false) {
+      resultDiv.textContent = msg;
+      resultDiv.className = isError ? 'error' : 'success';
+    }
+
+    async function fetchCompany(name) {
+      const token = localStorage.getItem(tokenKey);
+      const res = await fetch(`${apiBase}/${encodeURIComponent(name)}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const txt = await res.text();
+      if (!res.ok) throw new Error(`Status ${res.status}: ${txt}`);
+      return JSON.parse(txt);
+    }
+
+    btnFetch.addEventListener('click', async () => {
+      const name = localStorage.getItem(usernameKey);
+      if (!name) {
+        showMessage('sv_username not found in localStorage.', true);
+        return;
+      }
+      try {
+        const data = await fetchCompany(name);
+        // Populate form fields
+        ['gstNumber','description','address','contactEmail',
+         'contactPhone','website','industry','cinId','dinId']
+          .forEach(key => form[key].value = data[key] || '');
+        // Reveal the update section
+        updateSection.style.display = 'block';
+        showMessage('✅ Data loaded. You may now edit and update.');
+      } catch (err) {
+        console.error(err);
+        showMessage(err.message, true);
+      }
+    });
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const token = localStorage.getItem(tokenKey);
+      const name  = localStorage.getItem(usernameKey);
+
+      if (!name) {
+        showMessage('sv_username not found in localStorage.', true);
+        return;
+      }
+      if (!token) {
+        showMessage('sv_token not found in localStorage.', true);
+        return;
+      }
+
+      const payload = {
+        companyName: name,
+        gstNumber: form.gstNumber.value,
+        description: form.description.value,
+        address: form.address.value,
+        contactEmail: form.contactEmail.value,
+        contactPhone: form.contactPhone.value,
+        website: form.website.value,
+        industry: form.industry.value,
+        cinId: form.cinId.value,
+        dinId: form.dinId.value
+      };
+
+      try {
+        const res = await fetch(apiBase, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const txt = await res.text();
+        if (!res.ok) throw new Error(`Status ${res.status}: ${txt}`);
+        showMessage('✅ Update successful:\n' + txt);
+      } catch (err) {
+        console.error(err);
+        showMessage(err.message, true);
+      }
+    });
+  </script>
+</body>
+</html>
