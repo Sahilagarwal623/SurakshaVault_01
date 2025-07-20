@@ -74,7 +74,7 @@ Our mission is to make data "smart"—self-governing, purpose-bound, and auditab
 ### 🔗 One Platform, Many Defenses
 - 3-tier access model: Admin, Partner, User
 - Verified onboarding (CIN/DIN based)
-- Frontend-only decryption in zero-trust architecture
+- Frontend-only decryption in zero-trust architecture (Pseudonymization)
 
 ---
 
