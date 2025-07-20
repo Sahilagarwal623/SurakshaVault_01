@@ -15,7 +15,6 @@ Welcome to **SurakshaVault**, a privacy-first data-sharing framework built to tr
 - [⚙️ Installation](#️-installation)
 - [📖 Usage](#-usage)
 - [🤝 Contributing](#-contributing)
-- [📄 License](#-license)
 
 ---
 
@@ -54,7 +53,7 @@ Our mission is to make data "smart"—self-governing, purpose-bound, and auditab
 ## ✨ Key Features
 
 ### 🔐 Post-Sharing Data Control
-- Data is tokenized and decrypted only on verified frontend clients
+- Data is tokenized and decrypted only on verified clients
 - Purpose-limited access that auto-expires
 - Useless if APIs are leaked—no raw PII shared
 
@@ -208,9 +207,6 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
