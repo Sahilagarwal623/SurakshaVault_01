@@ -1,10 +1,5 @@
 # SurakshaVault – Unlock Trust, Not Your Data
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2014.0.0-brightgreen)](https://nodejs.org/)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
-[![Hackathon](https://img.shields.io/badge/Hackathon-Canara%20Bank%20Suraksha%202025-orange)](https://www.canarabank.com/)
-
 Welcome to **SurakshaVault**, a privacy-first data-sharing framework built to transform how fintechs handle, share, and govern sensitive user information. Designed by **Team Codeblooded** for **Canara Bank Hackathon Suraksha 2025**, SurakshaVault turns compliance and transparency into a competitive edge.
 
 ## 📋 Table of Contents
