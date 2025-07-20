@@ -229,11 +229,9 @@ Built with passion by **Team Codeblooded**:
    - **Admin Panel**: Verify partners and monitor system activity
    - **Partner Portal**: Request tokenized data access
 
-### API Documentation
 
-For detailed API documentation, visit `/api/docs` after starting the server.
 
----
+
 
 ## 🤝 Contributing
 
