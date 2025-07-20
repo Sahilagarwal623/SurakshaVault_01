@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,4 +25,6 @@ public class UserConsentModel {
     private Boolean showTransactions;
     private Boolean showAccountNumber;
     private Boolean showCardNumber;
+    private List<String> locations;
+    private LocalDateTime localDateTime;
 }

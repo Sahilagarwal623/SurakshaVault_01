@@ -44,11 +44,13 @@ public class SecurityConfig {
                                         "/auth/AdminRegistration",
                                         "/auth/PartnerRegistration",
                                         "/auth/login",
-                                "/auth/partnerRegistration/{username}")
+                                "/auth/partnerRegistration/{username}",
+                                        "/chat/**",
+                                        "/ws/**")
                                 .permitAll()
                                 .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
+//                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

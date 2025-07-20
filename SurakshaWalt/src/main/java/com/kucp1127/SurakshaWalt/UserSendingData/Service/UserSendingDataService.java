@@ -10,6 +10,7 @@ import com.kucp1127.SurakshaWalt.UserSendingData.DTO.UserDataDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -44,6 +45,23 @@ public class UserSendingDataService {
             Optional<UserInfoModel> userInfoModel1 = userInfoService.giveById(userDataDTO.getUsername());
             UserInfoModel userInfoModel = new UserInfoModel();
             if(userInfoModel1.isPresent()){
+
+                if(userDataDTO.getLocalDateTime().isAfter(userConsentModel.get().getLocalDateTime())){
+                    return userInfoModel;
+                }
+
+                List<String> l = userConsentModel.get().getLocations();
+                boolean flag=false;
+                for(String s : l){
+                    if (s.equals(userDataDTO.getLocation())) {
+                        flag = true;
+                        break;
+                    }
+                }
+
+                if(!flag){
+                    return userInfoModel;
+                }
                 userInfoModel.setUsername(userDataDTO.getUsername());
                 if(userConsentModel.get().getShowAccountNumber()) userInfoModel.setAccountNumber(userInfoModel1.get().getAccountNumber());
                 if(userConsentModel.get().getShowCardNumber()) userInfoModel.setCardNumber(userInfoModel1.get().getCardNumber());

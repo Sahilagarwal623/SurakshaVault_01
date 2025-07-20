@@ -7,6 +7,9 @@ import com.kucp1127.SurakshaWalt.UserConsent.Repository.UserConsentRepository;
 import com.kucp1127.SurakshaWalt.UserConsent.Repository.UserConsentStatusRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,6 +75,8 @@ public class UserConsentService {
                 existing.setShowTransactions(updated.getShowTransactions());
                 existing.setShowAccountNumber(updated.getShowAccountNumber());
                 existing.setShowCardNumber(updated.getShowCardNumber());
+                existing.setLocations(updated.getLocations());
+                existing.setLocalDateTime(updated.getLocalDateTime());
                 return repository.save(existing);
             });
     }
@@ -89,6 +94,8 @@ public class UserConsentService {
             existing.setShowTransactions(false);
             existing.setShowAccountNumber(false);
             existing.setShowCardNumber(false);
+            existing.setLocations(new ArrayList<>());
+            existing.setLocalDateTime(LocalDateTime.now());
             userConsentHistoryService.recordHistory(existing);
         }
 
@@ -101,6 +108,8 @@ public class UserConsentService {
                     existing.setShowTransactions(false);
                     existing.setShowAccountNumber(false);
                     existing.setShowCardNumber(false);
+                    existing.setLocations(new ArrayList<>());
+                    existing.setLocalDateTime(LocalDateTime.now());
                     return repository.save(existing);
                 });
     }
